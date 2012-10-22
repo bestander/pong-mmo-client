@@ -1,4 +1,8 @@
 /*
+ * Super Pong HTML5 multiplayer game
+ *
+ *
+ *
  * Author: Svetlana Raeva (svetlana.myth@gmail.com)
  * Author: Konstantin Raev (bestander@gmail.com)
  * Released under the MIT license
@@ -10,8 +14,8 @@ define(function (require) {
     , renderer = require('./lib/gameRenderer')
     ;
 
-  var game = new logic.game(function (position) {
-    //console.log(position);
+  var game = logic.startGame(function (position) {
+    console.log("ball changed position to " + JSON.stringify(position));
   });
 
   function drawRectangle(myRect, context) {
