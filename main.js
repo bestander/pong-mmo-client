@@ -1,10 +1,14 @@
-/**
- * Created with JetBrains WebStorm.
- * User: konstantinraev
- * Date: 28/09/12
- * Time: 11:48 PM
- */
-define('pong-renderer', ['jquery', 'game-logic', 'renderer'], function ($, logic, renderer) {
+/*
+ * Author: Svetlana Raeva (svetlana.myth@gmail.com)
+ * Author: Konstantin Raev (bestander@gmail.com)
+ * Released under the MIT license
+*/
+define(function (require) {
+
+  var $ = require('jquery')
+    , logic = require('./lib/gameLogic')
+    , renderer = require('./lib/gameRenderer')
+    ;
 
   var game = new logic.game(function (position) {
     //console.log(position);

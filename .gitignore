@@ -1,6 +1,4 @@
-jam
 .idea
-
 .DS_Store
 .DS_Store?
 ._*
@@ -8,3 +6,5 @@ jam
 .Trashes
 Icon?
 ehthumbs.db
+
+example
