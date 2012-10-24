@@ -1,6 +1,8 @@
 Super Pong: HTML5 Pong multiplayer game
 =============
 
+WIP still choosing betweend different package managers
+
 TODO: describe the library and place a pic.
 
 
@@ -13,13 +15,12 @@ This web project has the following setup:
 -------------
 
 * MIT-LICENSE.txt - license wording
-* package.json - [npm](http://npmjs.org) and [volo](http://volojs.org/) package descriptor
-* main.js - main AMD module that binds all the pieces together
+* component.json - [component](https://github.com/component/component/) library descriptor
+* index.js - main CJS module that binds all the pieces together
 * lib/ - components folder
-    * renderer.js - AMD module responsible for rendering the game objects on the screen
-    * gameLogic.js - AMD module responsible for all game events and rules being followed
-* volo-create-example-bootstrap.sh - sh script that downloads a sample empty volo project from hithub and calls the init method on the main file
-* amd-example-bootstrap.js - a require.js example main module that is used in the volo example folder
+    * renderer.js - CJS module responsible for rendering the game objects on the screen
+    * gameLogic.js - CJS module responsible for all game events and rules being followed
+* Makefile - standard compilation descriptor for [component](https://github.com/component/component/) 
 
 
 License
