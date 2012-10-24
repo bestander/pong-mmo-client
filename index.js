@@ -82,7 +82,7 @@ var oldInit = function () {
   };
 };
 
-module.exports = return {
+module.exports = {
   init: function(divId){
     renderer.init(divId)
   },
