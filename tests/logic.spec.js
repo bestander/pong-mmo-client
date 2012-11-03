@@ -1,14 +1,29 @@
-/*jshint node:true indent:2 */
-/*global it:true describe:true expect:true*/
+/*jshint node:true indent:2 laxcomma:true*/
+/*global it:true describe:true expect:true spyOn:true*/
 "use strict";
 
-var logic = require(__dirname + "/../lib/gameLogic.js");
+var logic = require(__dirname + "/../lib/gameLogic.js")
+  //, Emitter = require(__dirname + '/../components/component-emitter')
+  ;
 
 describe("Game logic", function () {
 
   describe("Initialize", function () {
     it("creates a field with defined width and height", function () {
-      expect(logic.testFunc(3)).toBe(6);
+      var gameEmitter = {
+          emit: function (name, param) {
+
+          }
+        }
+        ;
+      spyOn(gameEmitter, "emit");
+      logic.initGame(gameEmitter, {
+        "fieldWidth" : 100,
+        "fieldHeight" : 50
+      });
+
+      expect(gameEmitter.emit).toHaveBeenCalledWith("FieldCreated", {"width": 100, "height": 50});
+
     });
 
     it("adds a ball and two paddles on the field", function () {

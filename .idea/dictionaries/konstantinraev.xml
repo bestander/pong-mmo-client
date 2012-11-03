@@ -3,6 +3,7 @@
     <words>
       <w>jshint</w>
       <w>jslint</w>
+      <w>laxcomma</w>
     </words>
   </dictionary>
 </component>
