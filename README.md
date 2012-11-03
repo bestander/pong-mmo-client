@@ -20,9 +20,10 @@ This web project has the following setup:
 * lib/ - components folder
     * renderer.js - CJS module responsible for rendering the game objects on the screen
     * gameLogic.js - CJS module responsible for all game events and rules being followed
-* Makefile - standard compilation descriptor for [component](https://github.com/component/component/) 
+* tests/ - [jasmine](http://pivotal.github.com/jasmine/) unit tests
+* Makefile - standard compilation descriptor for [component](https://github.com/component/component/)
 
 
 License
 ----------
-Lll application code is released under MIT License, dependencies have their own permissive open source licenses.
+All application code is released under MIT License, dependencies have their own permissive open source licenses.
