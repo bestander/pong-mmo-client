@@ -1,5 +1,5 @@
 /*jshint node:true indent:2 laxcomma:true*/
-/*global it:true describe:true expect:true spyOn:true*/
+/*global it:true describe:true expect:true spyOn:true beforeEach:true */
 "use strict";
 
 var logic = require(__dirname + "/../lib/gameLogic.js")
@@ -8,21 +8,29 @@ var logic = require(__dirname + "/../lib/gameLogic.js")
 
 describe("Game logic", function () {
 
+  var gameEmitter;
+
+  beforeEach(function () {
+    gameEmitter = {
+        emit: function (name, param) {
+
+        }
+      }
+      ;
+    spyOn(gameEmitter, "emit");
+  });
+
   describe("Initialize", function () {
     it("creates a field with defined width and height", function () {
-      var gameEmitter = {
-          emit: function (name, param) {
-
-          }
-        }
-        ;
-      spyOn(gameEmitter, "emit");
-      logic.initGame(gameEmitter, {
-        "fieldWidth" : 100,
-        "fieldHeight" : 50
+      logic.API.initGame(gameEmitter, {
+        fieldWidth : 100,
+        fieldHeight : 50
       });
 
-      expect(gameEmitter.emit).toHaveBeenCalledWith("FieldCreated", {"width": 100, "height": 50});
+      expect(gameEmitter.emit).toHaveBeenCalledWith(logic.API.events.FieldCreated, {"width": 100, "height": 50});
+      expect(gameEmitter.emit).toHaveBeenCalledWith(logic.API.events.BallAdded, {x: 50, y: 25});
+      expect(gameEmitter.emit).toHaveBeenCalledWith(logic.API.events.PaddleAdded, {x: 0, y: 10});
+      expect(gameEmitter.emit).toHaveBeenCalledWith(logic.API.events.PaddleAdded, {x: 99, y: 10});
 
     });
 
