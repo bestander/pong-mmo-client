@@ -6,7 +6,8 @@
   "keywords": ["game", "html5", "canvas"],
   "dependencies": {
     "component/jquery": "*",
-    "component/emitter": "*"
+    "component/emitter": "*",
+    "bestander/declare.js": "*"
   },
   "development": {},
   "scripts": [

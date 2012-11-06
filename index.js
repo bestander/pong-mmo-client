@@ -12,9 +12,9 @@ var $ = require('jquery')
   , renderer = require('./lib/gameRenderer')
   ;
 
-var game = logic.startGame(function (position) {
-  console.log("ball changed position to " + JSON.stringify(position));
-  });
+//var game = logic.startGame(function (position) {
+//  console.log("ball changed position to " + JSON.stringify(position));
+//  });
 
 function drawRectangle(myRect, context) {
   context.beginPath();
@@ -84,7 +84,8 @@ var oldInit = function () {
 
 module.exports = {
   init: function(divId){
-    renderer.init(divId)
+//    renderer.init(divId)
+    logic.API.initGame({emit: function(){console.log("emmitting event"), {}}});
   },
 
   startGame:function () {
