@@ -2,7 +2,7 @@
 /*global it:true describe:true expect:true spyOn:true beforeEach:true */
 "use strict";
 
-var logic = require(__dirname + "/../lib/gameLogic.js")
+var logic = require("super-pong/lib/gameLogic.js")
   ;
 
 describe("Game logic", function () {

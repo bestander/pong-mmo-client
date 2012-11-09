@@ -9,7 +9,9 @@
     "component/emitter": "*",
     "bestander/declare.js": "*"
   },
-  "development": {},
+  "development": {
+    "bestander/jasmine-component": "*"
+  },
   "scripts": [
     "index.js",
     "lib/gameRenderer.js",
