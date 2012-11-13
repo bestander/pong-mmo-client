@@ -7,9 +7,9 @@
  * Author: Konstantin Raev (bestander@gmail.com)
  * Released under the MIT license
 */
-var $ = require('jquery')
-  , logic = require('./lib/gameLogic')
+var logic = require('./lib/gameLogic')
   , renderer = require('./lib/gameRenderer')
+  , $
   ;
 
 //var game = logic.startGame(function (position) {

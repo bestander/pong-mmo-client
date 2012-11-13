@@ -5,7 +5,6 @@
   "version": "0.0.1",
   "keywords": ["game", "html5", "canvas"],
   "dependencies": {
-    "component/jquery": "*",
     "component/emitter": "*",
     "bestander/declare.js": "*"
   },
