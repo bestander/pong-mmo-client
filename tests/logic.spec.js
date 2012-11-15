@@ -28,18 +28,8 @@ describe("Game logic", function () {
       expect(gameEventsEmitter.emit).toHaveBeenCalledWith(logic.API.events.FieldCreated, {width: 100, height: 50});
     });
 
-    it("adds a ball and two paddles on the field", function () {
-
-    });
-
-    it("makes paddles not responsive to controls", function () {
-
-    });
-
-    it("makes ball not moving", function () {
-
-    });
   });
+
 
   describe("Start game", function () {
     it("gives the ball non-zero speed", function () {
