@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="run tests Mac" type="JavascriptDebugSession" factoryName="Local">
+    <JSDebuggerConfigurationSettings>
+      <option name="engineId" value="chrome" />
+      <option name="fileUrl" value="file://$PROJECT_DIR$/tests/JasmineSpecRunner.html" />
+    </JSDebuggerConfigurationSettings>
+    <RunnerSettings RunnerId="JavascriptDebugRunner" />
+    <ConfigurationWrapper RunnerId="JavascriptDebugRunner" />
+    <method>
+      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_build" />
+    </method>
+  </configuration>
+</component>
