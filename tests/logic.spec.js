@@ -26,9 +26,6 @@ describe("Game logic", function () {
       });
 
       expect(gameEventsEmitter.emit).toHaveBeenCalledWith(logic.API.events.FieldCreated, {width: 100, height: 50});
-      expect(gameEventsEmitter.emit).toHaveBeenCalledWith(logic.API.events.BallAdded, {x: 50, y: 25});
-      expect(gameEventsEmitter.emit).toHaveBeenCalledWith(logic.API.events.PaddleAdded, {x: 0, y: 10});
-      expect(gameEventsEmitter.emit).toHaveBeenCalledWith(logic.API.events.PaddleAdded, {x: 100, y: 10});
     });
 
     it("adds a ball and two paddles on the field", function () {
