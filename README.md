@@ -20,6 +20,9 @@ API
 
 TODO
 
+The fact that most objects expose their internal state via public properties makes the code look insecure.
+I might want to expose the properties with getters and don't pair them with setters.
+
 This web project has the following setup:
 -------------
 

@@ -23,11 +23,11 @@ describe("Pong Field", function () {
       var field = new Field({width: 100, height: 200}, gameEventsEmitter);
 
       expect(gameEventsEmitter.emit.calls.length).toEqual(0);
-      expect(field._size.width).toEqual(100);
-      expect(field._size.height).toEqual(200);
-      expect(field._ball).toBeNull();
-      expect(field._paddles.first).toBeNull();
-      expect(field._paddles.second).toBeNull();
+      expect(field.size.width).toEqual(100);
+      expect(field.size.height).toEqual(200);
+      expect(field.ball).toBeNull();
+      expect(field.paddles.first).toBeNull();
+      expect(field.paddles.second).toBeNull();
     });
   });
 
@@ -42,8 +42,8 @@ describe("Pong Field", function () {
     it("width or height creates a field with standard dimensions", function () {
       var field = new Field(null, gameEventsEmitter);
 
-      expect(field._size.width).toBe(100);
-      expect(field._size.height).toBe(100);
+      expect(field.size.width).toBe(100);
+      expect(field.size.height).toBe(100);
     });
   });
 
@@ -58,8 +58,8 @@ describe("Pong Field", function () {
 
       position = {x: 50, y: 100};
       expect(gameEventsEmitter.emit).toHaveBeenCalledWith(field._static.events.BallAdded, position);
-      expect(field._ball.object).toBe(ball);
-      expect(field._ball.position).toEqual(position);
+      expect(field.ball.object).toBe(ball);
+      expect(field.ball.position).toEqual(position);
     });
   });
 
@@ -74,10 +74,10 @@ describe("Pong Field", function () {
 
       position = {x: 0, y: field._static.PADDLE_INITIAL_Y_POSITION};
       expect(gameEventsEmitter.emit).toHaveBeenCalledWith(field._static.events.PaddleAdded, position);
-      expect(field._paddles.first.object).toBe(paddle);
-      expect(field._paddles.first.position).toEqual(position);
-      expect(field._paddles.second).toBeNull();
-      expect(field._ball).toBeNull();
+      expect(field.paddles.first.object).toBe(paddle);
+      expect(field.paddles.first.position).toEqual(position);
+      expect(field.paddles.second).toBeNull();
+      expect(field.ball).toBeNull();
     });
 
     it("called second time adds right paddle", function () {
@@ -92,9 +92,9 @@ describe("Pong Field", function () {
       position = {x: 100, y: field._static.PADDLE_INITIAL_Y_POSITION};
       expect(gameEventsEmitter.emit.calls.length).toBe(2);
       expect(gameEventsEmitter.emit).toHaveBeenCalledWith(field._static.events.PaddleAdded, position);
-      expect(field._paddles.first.object).toBe(paddle);
-      expect(field._paddles.second.object).toBe(paddle);
-      expect(field._paddles.second.position).toEqual(position);
+      expect(field.paddles.first.object).toBe(paddle);
+      expect(field.paddles.second.object).toBe(paddle);
+      expect(field.paddles.second.position).toEqual(position);
     });
 
     it("called third time throws an error", function () {

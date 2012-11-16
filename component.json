@@ -2,7 +2,7 @@
   "name": "super-pong",
   "repo": "bestander/super-pong",
   "description": "HTML5 pong multiplayer game that can be embedded on a page",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "keywords": ["game", "html5", "canvas"],
   "dependencies": {
     "component/emitter": "*",

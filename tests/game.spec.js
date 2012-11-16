@@ -20,11 +20,11 @@ describe("Pong Game", function () {
   describe("constructor with no parameters", function () {
     it("creates a field of standard size with ball and paddles", function () {
       var game = new Game(gameEventsEmitter);
-      expect(game._field._paddles.first).not.toBeNull();
-      expect(game._field._paddles.second).not.toBeNull();
-      expect(game._field._ball).not.toBeNull();
-      expect(game._field._ball.position.x).toEqual(game._field._size.width / 2);
-      expect(game._field._ball.position.y).toEqual(game._field._size.height / 2);
+      expect(game.field.paddles.first).not.toBeNull();
+      expect(game.field.paddles.second).not.toBeNull();
+      expect(game.field.ball).not.toBeNull();
+      expect(game.field.ball.position.x).toEqual(game.field.size.width / 2);
+      expect(game.field.ball.position.y).toEqual(game.field.size.height / 2);
     });
   });
 
@@ -63,15 +63,107 @@ describe("Pong Game", function () {
 
       game = new Game(gameEventsEmitter);
       initialBallLocation = {
-        x: game._field._ball.position.x,
-        y: game._field._ball.position.y
+        x: game.field.ball.position.x,
+        y: game.field.ball.position.y
       };
       game.startMatch();
-      expect(game._field._ball.position).toEqual(initialBallLocation);
+      expect(game.field.ball.position).toEqual(initialBallLocation);
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
-      expect(game._field._ball.position).not.toEqual(initialBallLocation);
+      expect(game.field.ball.position).not.toEqual(initialBallLocation);
     });
   });
 
+  describe("Ball moving", function () {
+    var initialBallLocation
+      , game
+      , timerCallback;
+
+    beforeEach(function () {
+      timerCallback = jasmine.createSpy('timerCallback');
+      jasmine.Clock.useMock();
+
+      game = new Game(gameEventsEmitter);
+      game.startMatch();
+      initialBallLocation = {
+        x: game.field.ball.position.x,
+        y: game.field.ball.position.y
+      };
+    });
+
+    it("right appears to the right on the next step", function () {
+      game.field.ball.object.giveImpulse({
+        x: 5,
+        y: 0
+      });
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      expect(game.field.ball.position).toEqual({
+        x: initialBallLocation.x + 5,
+        y: initialBallLocation.y
+      });
+    });
+
+    it("left appears to the left on the next step", function () {
+      game.field.ball.object.giveImpulse({
+        x: -10,
+        y: 0
+      });
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      expect(game.field.ball.position).toEqual({
+        x: initialBallLocation.x - 10,
+        y: initialBallLocation.y
+      });
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      expect(game.field.ball.position).toEqual({
+        x: initialBallLocation.x - 20,
+        y: initialBallLocation.y
+      });
+
+    });
+
+    it("up appears higher on the next step", function () {
+      game.field.ball.object.giveImpulse({
+        x: 0,
+        y: -5
+      });
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      expect(game.field.ball.position).toEqual({
+        x: initialBallLocation.x,
+        y: initialBallLocation.y - 5
+      });
+
+    });
+
+    it("down appears lower on the next step", function () {
+      game.field.ball.object.giveImpulse({
+        x: 0,
+        y: 5
+      });
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      expect(game.field.ball.position).toEqual({
+        x: initialBallLocation.x,
+        y: initialBallLocation.y + 5
+      });
+
+    });
+
+    it("up-right appears higher and to the right on the next step", function () {
+      game.field.ball.object.giveImpulse({
+        x: 5,
+        y: -5
+      });
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      expect(game.field.ball.position).toEqual({
+        x: initialBallLocation.x + 5,
+        y: initialBallLocation.y - 5
+      });
+    });
+
+  });
+
+  describe("Ball bouncing", function () {
+    it("from top edge changes vertical speed to opposite but horizontal remains unchanged", function () {
+
+    });
+  });
 
 });
