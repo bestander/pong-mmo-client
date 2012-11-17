@@ -214,21 +214,21 @@ describe("Pong Game", function () {
     it("from right paddle bounces left with the same speed and vertical speed is unchanged", function () {
       game.field.ball.object.giveImpulse({
         x: 10,
-        y: 3
+        y: 4
       });
       game.field.paddles.second.object.giveImpulse("DOWN");
 
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
 
-      expect(game.field.ball.position).toEqual({x: 40, y: 26});
-      expect(game.field.ball.object.velocity).toEqual({dx: 10, dy: 3});
-      expect(game.field.paddles.second.position).toEqual({x: 40, y: 20});
+      expect(game.field.ball.position).toEqual({x: 40, y: 28});
+      expect(game.field.ball.object.velocity).toEqual({dx: 10, dy: 4});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 28});
 
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
 
-      expect(game.field.ball.position).toEqual({x: 30, y: 29});
-      expect(game.field.ball.object.velocity).toEqual({dx: -10, dy: 3});
+      expect(game.field.ball.position).toEqual({x: 30, y: 32});
+      expect(game.field.ball.object.velocity).toEqual({dx: -10, dy: 4});
 
     });
 
@@ -275,21 +275,21 @@ describe("Pong Game", function () {
     it("from left paddle bounces right with the same speed and vertical speed is unchanged", function () {
       game.field.ball.object.giveImpulse({
         x: -10,
-        y: 3
+        y: 4
       });
       game.field.paddles.first.object.giveImpulse("DOWN");
 
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
 
-      expect(game.field.ball.position).toEqual({x: 0, y: 26});
-      expect(game.field.ball.object.velocity).toEqual({dx: -10, dy: 3});
-      expect(game.field.paddles.first.position).toEqual({x: 0, y: 20});
+      expect(game.field.ball.position).toEqual({x: 0, y: 28});
+      expect(game.field.ball.object.velocity).toEqual({dx: -10, dy: 4});
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 28});
 
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
 
-      expect(game.field.ball.position).toEqual({x: 10, y: 29});
-      expect(game.field.ball.object.velocity).toEqual({dx: 10, dy: 3});
+      expect(game.field.ball.position).toEqual({x: 10, y: 32});
+      expect(game.field.ball.object.velocity).toEqual({dx: 10, dy: 4});
 
     });
 
@@ -335,16 +335,185 @@ describe("Pong Game", function () {
 
   });
 
-  describe("Paddle receiving DOWN impulse", function () {
+  describe("Paddle receiving impulse", function () {
 
-    it("slows down and later stops", function () {
+    var game
+      , timerCallback;
+
+    beforeEach(function () {
+      timerCallback = jasmine.createSpy('timerCallback');
+      jasmine.Clock.useMock();
+
+      game = new Game(gameEventsEmitter, {fieldWidth: 40, fieldHeight: 80});
+      game.startMatch();
+    });
+
+    it("DOWN moves down, slows down and stops eventually", function () {
+
+      game.field.paddles.first.object.giveImpulse("DOWN");
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      game.field.paddles.second.object.giveImpulse("DOWN");
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 20});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 28});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 20});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 34});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 28});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 38});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 34});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 41});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 38});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 43});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 41});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 44});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 43});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 44});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 44});
+
+    });
+
+    it("UP moves up, slows down and stops eventually", function () {
+
+      game.field.paddles.first.object.giveImpulse("DOWN");
+      game.field.paddles.second.object.giveImpulse("DOWN");
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      game.field.paddles.first.object.giveImpulse("UP");
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      game.field.paddles.second.object.giveImpulse("UP");
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 34});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 44});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 26});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 34});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 20});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 26});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 16});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 20});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 13});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 16});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 11});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 13});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 10});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 11});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 10});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 10});
 
     });
 
   });
 
-  xdescribe("Ball scoring", function () {
+  describe("Paddle hitting", function () {
+
+    var game
+      , timerCallback;
+
+    beforeEach(function () {
+      timerCallback = jasmine.createSpy('timerCallback');
+      jasmine.Clock.useMock();
+
+      game = new Game(gameEventsEmitter, {fieldWidth: 40, fieldHeight: 30});
+      game.startMatch();
+    });
+
+    it("ceiling stops moving", function () {
+      game.field.paddles.second.object.giveImpulse("UP");
+      game.field.paddles.first.object.giveImpulse("UP");
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 10});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 10});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 0});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 0});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 0});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 0});
+
+    });
+
+    it("floor stops moving", function () {
+      game.field.paddles.second.object.giveImpulse("DOWN");
+      game.field.paddles.first.object.giveImpulse("DOWN");
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 28});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 28});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 30});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 30});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 30});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 30});
+
+    });
+  });
+
+
+  describe("Ball scoring", function () {
 
   });
 
 });
+

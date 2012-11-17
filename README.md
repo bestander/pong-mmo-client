@@ -18,10 +18,11 @@ TODO
 API
 ------------
 
-TODO
+TODO refactor:
 
-The fact that most objects expose their internal state via public properties makes the code look insecure.
-I might want to expose the properties with getters and don't pair them with setters.
+- Refactor pongGame loop function
+- Don't expose objejct's velocity and position state to public
+- Replace checks for positions with checks for event emissions
 
 This web project has the following setup:
 -------------
