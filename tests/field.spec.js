@@ -47,7 +47,7 @@ describe("Pong Field", function () {
     });
   });
 
-  describe("add ball function", function () {
+  describe("'add ball' function", function () {
     it("adds a ball to a field and positions it in the centre", function () {
       var position;
       var field = new Field({width: 100, height: 200}, gameEventsEmitter);
@@ -63,7 +63,23 @@ describe("Pong Field", function () {
     });
   });
 
-  describe("add paddle function", function () {
+  describe("'add ball' twice throws an error", function () {
+    it("adds a ball to a field and positions it in the centre", function () {
+      var addTwice;
+      var position;
+      var field = new Field({width: 100, height: 200}, gameEventsEmitter);
+      var ball = {
+        internalField: "value"
+      };
+      field.addBall(ball);
+      addTwice = function () {
+        field.addBall(ball);
+      };
+      expect(addTwice).toThrow("Ball already present");
+    });
+  });
+
+  describe("'add paddle' function", function () {
     it("called first time adds left paddle", function () {
       var position;
       var field = new Field({width: 100, height: 200}, gameEventsEmitter);

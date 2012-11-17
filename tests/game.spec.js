@@ -161,9 +161,190 @@ describe("Pong Game", function () {
   });
 
   describe("Ball bouncing", function () {
+    var game
+      , timerCallback;
+
+    beforeEach(function () {
+      timerCallback = jasmine.createSpy('timerCallback');
+      jasmine.Clock.useMock();
+
+      game = new Game(gameEventsEmitter, {fieldWidth: 40, fieldHeight: 40});
+      game.startMatch();
+    });
+
     it("from top edge changes vertical speed to opposite but horizontal remains unchanged", function () {
+      game.field.ball.object.giveImpulse({
+        x: 5,
+        y: -10
+      });
+      expect(game.field.ball.position).toEqual({x: 20, y: 20});
+      expect(game.field.ball.object.velocity).toEqual({dx: 5, dy: -10});
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 30, y: 0});
+      expect(game.field.ball.object.velocity).toEqual({dx: 5, dy: -10});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 35, y: 10});
+      expect(game.field.ball.object.velocity).toEqual({dx: 5, dy: 10});
 
     });
+
+    it("from bottom edge changes vertical speed to opposite but horizontal remains unchanged", function () {
+      game.field.ball.object.giveImpulse({
+        x: -5,
+        y: 10
+      });
+      expect(game.field.ball.position).toEqual({x: 20, y: 20});
+      expect(game.field.ball.object.velocity).toEqual({dx: -5, dy: 10});
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 10, y: 40});
+      expect(game.field.ball.object.velocity).toEqual({dx: -5, dy: 10});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 5, y: 30});
+      expect(game.field.ball.object.velocity).toEqual({dx: -5, dy: -10});
+    });
+
+    it("from right paddle bounces left with the same speed and vertical speed is unchanged", function () {
+      game.field.ball.object.giveImpulse({
+        x: 10,
+        y: 3
+      });
+      game.field.paddles.second.object.giveImpulse("DOWN");
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 40, y: 26});
+      expect(game.field.ball.object.velocity).toEqual({dx: 10, dy: 3});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 20});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 30, y: 29});
+      expect(game.field.ball.object.velocity).toEqual({dx: -10, dy: 3});
+
+    });
+
+    it("from right paddle top corner bounces left with the same speed and vertical speed is unchanged", function () {
+      game.field.ball.object.giveImpulse({
+        x: 10,
+        y: -5
+      });
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 40, y: 10});
+      expect(game.field.ball.object.velocity).toEqual({dx: 10, dy: -5});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 10});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 30, y: 5});
+      expect(game.field.ball.object.velocity).toEqual({dx: -10, dy: -5});
+
+    });
+
+    it("from right paddle bottom corner bounces left with the same speed and vertical speed is unchanged", function () {
+      game.field.ball.object.giveImpulse({
+        x: 10,
+        y: 0
+      });
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 40, y: 20});
+      expect(game.field.ball.object.velocity).toEqual({dx: 10, dy: 0});
+      expect(game.field.paddles.second.position).toEqual({x: 40, y: 10});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 30, y: 20});
+      expect(game.field.ball.object.velocity).toEqual({dx: -10, dy: 0});
+
+    });
+
+    it("from left paddle bounces right with the same speed and vertical speed is unchanged", function () {
+      game.field.ball.object.giveImpulse({
+        x: -10,
+        y: 3
+      });
+      game.field.paddles.first.object.giveImpulse("DOWN");
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 0, y: 26});
+      expect(game.field.ball.object.velocity).toEqual({dx: -10, dy: 3});
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 20});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 10, y: 29});
+      expect(game.field.ball.object.velocity).toEqual({dx: 10, dy: 3});
+
+    });
+
+    it("from left paddle top corner bounces right with the same speed and vertical speed is unchanged", function () {
+      game.field.ball.object.giveImpulse({
+        x: -10,
+        y: -5
+      });
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 0, y: 10});
+      expect(game.field.ball.object.velocity).toEqual({dx: -10, dy: -5});
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 10});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 10, y: 5});
+      expect(game.field.ball.object.velocity).toEqual({dx: 10, dy: -5});
+
+    });
+
+    it("from left paddle bottom corner bounces right with the same speed and vertical speed is unchanged", function () {
+      game.field.ball.object.giveImpulse({
+        x: -10,
+        y: 0
+      });
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 0, y: 20});
+      expect(game.field.ball.object.velocity).toEqual({dx: -10, dy: 0});
+      expect(game.field.paddles.first.position).toEqual({x: 0, y: 10});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(game.field.ball.position).toEqual({x: 10, y: 20});
+      expect(game.field.ball.object.velocity).toEqual({dx: 10, dy: 0});
+
+    });
+
+  });
+
+  describe("Paddle receiving DOWN impulse", function () {
+
+    it("slows down and later stops", function () {
+
+    });
+
+  });
+
+  xdescribe("Ball scoring", function () {
+
   });
 
 });
