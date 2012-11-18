@@ -2,8 +2,9 @@
 /*global it:true describe:true expect:true spyOn:true beforeEach:true jasmine:true */
 "use strict";
 
-var Game = require("super-pong/lib/pongGame.js")
-  ;
+var Game = require("super-pong/lib/pongGame.js");
+var events = require("super-pong/lib/gameEvents.js");
+
 
 describe("Pong Game", function () {
 
@@ -20,11 +21,14 @@ describe("Pong Game", function () {
   describe("constructor with no parameters", function () {
     it("creates a field of standard size with ball and paddles", function () {
       var game = new Game(gameEventsEmitter);
-      expect(game.field.paddles.first).not.toBeNull();
-      expect(game.field.paddles.second).not.toBeNull();
-      expect(game.field.ball).not.toBeNull();
-      expect(game.field.ball.position.x).toEqual(game.field.size.width / 2);
-      expect(game.field.ball.position.y).toEqual(game.field.size.height / 2);
+      var size = {width: 100, height: 100};
+
+      expect(gameEventsEmitter.emit.calls.length).toEqual(4);
+      expect(gameEventsEmitter.emit).toHaveBeenCalledWith(events.GameEventsEnum.FIELD_CREATED, size);
+      expect(gameEventsEmitter.emit).toHaveBeenCalledWith(events.GameEventsEnum.BALL_ADDED, {x: size.width / 2, y: size.height / 2});
+      expect(gameEventsEmitter.emit).toHaveBeenCalledWith(events.GameEventsEnum.PADDLE_ADDED, {x: 0, y: 10});
+      expect(gameEventsEmitter.emit).toHaveBeenCalledWith(events.GameEventsEnum.PADDLE_ADDED, {x: size.width, y: 10});
+
     });
   });
 
@@ -32,7 +36,7 @@ describe("Pong Game", function () {
     it("FieldAdded event with field measures", function () {
       var params = {fieldWidth: 300, fieldHeight: 400};
       var game = new Game(gameEventsEmitter, params);
-      expect(gameEventsEmitter.emit).toHaveBeenCalledWith(game._static.events.FieldCreated,
+      expect(gameEventsEmitter.emit).toHaveBeenCalledWith(events.GameEventsEnum.FIELD_CREATED,
         {width: params.fieldWidth, height: params.fieldHeight});
     });
   });
@@ -59,17 +63,20 @@ describe("Pong Game", function () {
 
     it("makes the ball moving", function () {
       var initialBallLocation
-        , game;
+        , game
+        , size = {width: 100, height: 100};
 
       game = new Game(gameEventsEmitter);
+
       initialBallLocation = {
-        x: game.field.ball.position.x,
-        y: game.field.ball.position.y
+        x: size.width / 2,
+        y: size.height / 2
       };
       game.startMatch();
-      expect(game.field.ball.position).toEqual(initialBallLocation);
+      expect(gameEventsEmitter.emit).toHaveBeenCalledWith(events.GameEventsEnum.BALL_ADDED, initialBallLocation);
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
-      expect(game.field.ball.position).not.toEqual(initialBallLocation);
+      expect(gameEventsEmitter.emit).toHaveBeenCalledWith(events.GameEventsEnum.BALL_POSITION_CHANGED);
+      expect(gameEventsEmitter.emit).not.toHaveBeenCalledWith(events.GameEventsEnum.BALL_POSITION_CHANGED, initialBallLocation);
     });
   });
 

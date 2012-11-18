@@ -7,4 +7,4 @@
  * Author: Konstantin Raev (bestander@gmail.com)
  * Released under the MIT license
 */
-  var renderer = require('./lib/gameRenderer');
+// TODO exports game
