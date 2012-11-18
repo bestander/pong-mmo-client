@@ -5,6 +5,23 @@
 var Game = require("super-pong/lib/pongGame.js");
 var events = require("super-pong/lib/gameEvents.js");
 
+/**
+ * search latest event index in the event list of a jasmine spied object
+ * @param event event object
+ * @param calls calls array of spied object
+ * @return {number} index, -1 if none found
+ */
+function findTheLatestEmitOfAnEvent(event, calls) {
+  var i = calls.length - 1;
+  while (i >= 0) {
+    if (calls[i].args[0] === event) {
+      return i;
+    }
+    i -= 1;
+  }
+  return -1;
+}
+
 
 describe("Pong Game", function () {
 
@@ -52,6 +69,7 @@ describe("Pong Game", function () {
     });
   });
 
+
   describe("start match", function () {
 
     var timerCallback;
@@ -62,21 +80,22 @@ describe("Pong Game", function () {
     });
 
     it("makes the ball moving", function () {
-      var initialBallLocation
-        , game
-        , size = {width: 100, height: 100};
+      var callIndex;
+      var initialBallLocation;
+      var game;
 
       game = new Game(gameEventsEmitter);
-
-      initialBallLocation = {
-        x: size.width / 2,
-        y: size.height / 2
-      };
       game.startMatch();
-      expect(gameEventsEmitter.emit).toHaveBeenCalledWith(events.GameEventsEnum.BALL_ADDED, initialBallLocation);
+
+      initialBallLocation = gameEventsEmitter.emit.calls[findTheLatestEmitOfAnEvent(
+        events.GameEventsEnum.BALL_ADDED, gameEventsEmitter.emit.calls)].args[1];
+      expect(initialBallLocation).toEqual({x: 50, y: 50});
+
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
-      expect(gameEventsEmitter.emit).toHaveBeenCalledWith(events.GameEventsEnum.BALL_POSITION_CHANGED);
-      expect(gameEventsEmitter.emit).not.toHaveBeenCalledWith(events.GameEventsEnum.BALL_POSITION_CHANGED, initialBallLocation);
+      callIndex = findTheLatestEmitOfAnEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls);
+      expect(callIndex).toBeGreaterThan(-1);
+      expect(gameEventsEmitter.emit.calls[callIndex].args[1]).not.toEqual(initialBallLocation);
+
     });
   });
 
@@ -91,10 +110,8 @@ describe("Pong Game", function () {
 
       game = new Game(gameEventsEmitter);
       game.startMatch();
-      initialBallLocation = {
-        x: game.field.ball.position.x,
-        y: game.field.ball.position.y
-      };
+      initialBallLocation = gameEventsEmitter.emit.calls[findTheLatestEmitOfAnEvent(
+        events.GameEventsEnum.BALL_ADDED, gameEventsEmitter.emit.calls)].args[1];
     });
 
     it("right appears to the right on the next step", function () {
