@@ -3,25 +3,25 @@
 "use strict";
 
 var Game = require("super-pong/lib/pongGame.js");
+var Field = require("super-pong/lib/pongField.js");
 var events = require("super-pong/lib/gameEvents.js");
 
 /**
  * search latest event index in the event list of a jasmine spied object
- * @param event event object
+ * @param event event identifier
  * @param calls calls array of spied object
- * @return {number} index, -1 if none found
+ * @return {Array} arguments with which the event was emitted or null if none found
  */
-function findTheLatestEmitOfAnEvent(event, calls) {
+function findArgumentsOfTheLatestEvent(event, calls) {
   var i = calls.length - 1;
   while (i >= 0) {
     if (calls[i].args[0] === event) {
-      return i;
+      return calls[i].args;
     }
     i -= 1;
   }
-  return -1;
+  return null;
 }
-
 
 describe("Pong Game", function () {
 
@@ -80,106 +80,144 @@ describe("Pong Game", function () {
     });
 
     it("makes the ball moving", function () {
-      var callIndex;
+      var eventArgs;
       var initialBallLocation;
       var game;
 
       game = new Game(gameEventsEmitter);
       game.startMatch();
 
-      initialBallLocation = gameEventsEmitter.emit.calls[findTheLatestEmitOfAnEvent(
-        events.GameEventsEnum.BALL_ADDED, gameEventsEmitter.emit.calls)].args[1];
+      initialBallLocation = findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_ADDED, gameEventsEmitter.emit.calls)[1];
       expect(initialBallLocation).toEqual({x: 50, y: 50});
 
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
-      callIndex = findTheLatestEmitOfAnEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls);
-      expect(callIndex).toBeGreaterThan(-1);
-      expect(gameEventsEmitter.emit.calls[callIndex].args[1]).not.toEqual(initialBallLocation);
+      eventArgs = findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls);
+      expect(eventArgs).not.toBeNull();
+      expect(eventArgs[1]).not.toEqual(initialBallLocation);
 
     });
   });
 
-  describe("Ball moving", function () {
+  describe("Start match with ball set impulse to", function () {
     var initialBallLocation
       , game
       , timerCallback;
+    var eventArgs;
 
     beforeEach(function () {
       timerCallback = jasmine.createSpy('timerCallback');
       jasmine.Clock.useMock();
 
+
       game = new Game(gameEventsEmitter);
-      game.startMatch();
-      initialBallLocation = gameEventsEmitter.emit.calls[findTheLatestEmitOfAnEvent(
-        events.GameEventsEnum.BALL_ADDED, gameEventsEmitter.emit.calls)].args[1];
+      initialBallLocation = findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_ADDED, gameEventsEmitter.emit.calls)[1];
+
     });
 
-    it("right appears to the right on the next step", function () {
-      game.field.ball.object.giveImpulse({
-        x: 5,
-        y: 0
+    it("incorrect direction throws an error", function () {
+      var throwing;
+
+      throwing = function () {
+        game.startMatch({
+          ballXSpeed: "a",
+          ballYSpeed: 0
+        });
+      };
+      expect(throwing).toThrow("incorrect ball initial direction");
+
+      throwing = function () {
+        game.startMatch({
+          ballXSpeed: 0,
+          ballYSpeed: "c"
+        });
+      };
+      expect(throwing).toThrow("incorrect ball initial direction");
+
+    });
+
+    it("right makes ball move right on the next step", function () {
+      game.startMatch({
+        ballXSpeed: 5,
+        ballYSpeed: 0
       });
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
-      expect(game.field.ball.position).toEqual({
+      eventArgs = findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls);
+      expect(eventArgs).not.toBeNull();
+      expect(eventArgs[1]).toEqual({
         x: initialBallLocation.x + 5,
         y: initialBallLocation.y
       });
     });
 
-    it("left appears to the left on the next step", function () {
-      game.field.ball.object.giveImpulse({
-        x: -10,
-        y: 0
+    it("left makes ball move left on the next step", function () {
+      game.startMatch({
+        ballXSpeed: -10,
+        ballYSpeed: 0
       });
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
-      expect(game.field.ball.position).toEqual({
+
+      eventArgs = findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls);
+      expect(eventArgs).not.toBeNull();
+      expect(eventArgs[1]).toEqual({
         x: initialBallLocation.x - 10,
         y: initialBallLocation.y
       });
+
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
-      expect(game.field.ball.position).toEqual({
+      eventArgs = findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls);
+      expect(eventArgs).not.toBeNull();
+      expect(eventArgs[1]).toEqual({
         x: initialBallLocation.x - 20,
         y: initialBallLocation.y
       });
 
     });
 
-    it("up appears higher on the next step", function () {
-      game.field.ball.object.giveImpulse({
-        x: 0,
-        y: -5
+    it("up makes ball move up on the next step", function () {
+      game.startMatch({
+        ballXSpeed: 0,
+        ballYSpeed: -5
       });
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
-      expect(game.field.ball.position).toEqual({
+
+      eventArgs = findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls);
+      expect(eventArgs).not.toBeNull();
+      expect(eventArgs[1]).toEqual({
         x: initialBallLocation.x,
         y: initialBallLocation.y - 5
       });
 
     });
 
-    it("down appears lower on the next step", function () {
-      game.field.ball.object.giveImpulse({
-        x: 0,
-        y: 5
+    it("down makes ball move down on the next step", function () {
+      game.startMatch({
+        ballXSpeed: 0,
+        ballYSpeed: 5
       });
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
-      expect(game.field.ball.position).toEqual({
+
+      eventArgs = findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls);
+      expect(eventArgs).not.toBeNull();
+      expect(eventArgs[1]).toEqual({
         x: initialBallLocation.x,
         y: initialBallLocation.y + 5
       });
-
     });
 
-    it("up-right appears higher and to the right on the next step", function () {
-      game.field.ball.object.giveImpulse({
-        x: 5,
-        y: -5
+    it("up-right makes ball move up and to the right on the next step", function () {
+      game.startMatch({
+        ballXSpeed: 5,
+        ballYSpeed: -5
       });
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
-      expect(game.field.ball.position).toEqual({
+
+      eventArgs = findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls);
+      expect(eventArgs).not.toBeNull();
+      expect(eventArgs[1]).toEqual({
         x: initialBallLocation.x + 5,
         y: initialBallLocation.y - 5
       });
+
     });
 
   });
@@ -187,55 +225,75 @@ describe("Pong Game", function () {
   describe("Ball bouncing", function () {
     var game
       , timerCallback;
+    var initialBallLocation;
+
 
     beforeEach(function () {
       timerCallback = jasmine.createSpy('timerCallback');
       jasmine.Clock.useMock();
 
       game = new Game(gameEventsEmitter, {fieldWidth: 40, fieldHeight: 40});
-      game.startMatch();
+      initialBallLocation = findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_ADDED, gameEventsEmitter.emit.calls)[1];
     });
 
     it("from top edge changes vertical speed to opposite but horizontal remains unchanged", function () {
-      game.field.ball.object.giveImpulse({
-        x: 5,
-        y: -10
+      game.startMatch({
+        ballXSpeed: 5,
+        ballYSpeed: -10
       });
-      expect(game.field.ball.position).toEqual({x: 20, y: 20});
-      expect(game.field.ball.object.velocity).toEqual({dx: 5, dy: -10});
+
+      expect(initialBallLocation).toEqual({x: 20, y: 20});
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
 
-      expect(game.field.ball.position).toEqual({x: 30, y: 0});
-      expect(game.field.ball.object.velocity).toEqual({dx: 5, dy: -10});
+      expect(findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls)[1])
+        .toEqual({x: 30, y: 0});
 
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
 
-      expect(game.field.ball.position).toEqual({x: 35, y: 10});
-      expect(game.field.ball.object.velocity).toEqual({dx: 5, dy: 10});
+      expect(findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls)[1])
+        .toEqual({x: 35, y: 10});
 
     });
 
     it("from bottom edge changes vertical speed to opposite but horizontal remains unchanged", function () {
-      game.field.ball.object.giveImpulse({
-        x: -5,
-        y: 10
+      game.startMatch({
+        ballXSpeed: -5,
+        ballYSpeed: 10
       });
-      expect(game.field.ball.position).toEqual({x: 20, y: 20});
-      expect(game.field.ball.object.velocity).toEqual({dx: -5, dy: 10});
-      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
-      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
-
-      expect(game.field.ball.position).toEqual({x: 10, y: 40});
-      expect(game.field.ball.object.velocity).toEqual({dx: -5, dy: 10});
 
       jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
 
-      expect(game.field.ball.position).toEqual({x: 5, y: 30});
-      expect(game.field.ball.object.velocity).toEqual({dx: -5, dy: -10});
+      expect(findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls)[1])
+        .toEqual({x: 10, y: 40});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls)[1])
+        .toEqual({x: 5, y: 10});
+
     });
 
     it("from right paddle bounces left with the same speed and vertical speed is unchanged", function () {
+      game.startMatch({
+        ballXSpeed: -5,
+        ballYSpeed: 10
+      });
+      game.movePaddle(Field["static"].PaddlesEnum.SECOND, )
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls)[1])
+        .toEqual({x: 10, y: 40});
+
+      jasmine.Clock.tick(game._static.TICK_DURATION_MS);
+
+      expect(findArgumentsOfTheLatestEvent(events.GameEventsEnum.BALL_POSITION_CHANGED, gameEventsEmitter.emit.calls)[1])
+        .toEqual({x: 5, y: 10});
+
+
       game.field.ball.object.giveImpulse({
         x: 10,
         y: 4
