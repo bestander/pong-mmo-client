@@ -18,11 +18,6 @@ TODO
 API
 ------------
 
-TODO refactor:
-
-- Refactor pongGame loop function
-- Don't expose objejct's velocity and position state to public
-- Replace checks for positions with checks for event emissions
 
 This web project has the following setup:
 -------------
