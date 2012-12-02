@@ -15,7 +15,14 @@
   "development": {
     "bestander/jasmine-component": "*"
   },
+  "main": "index.js",
   "scripts": [
-    "index.js"
+    "index.js",
+    "src/pongGame.js",
+    "src/master/gameMaster.js",
+    "src/master/socketGameMaster.js",
+    "src/player/player.js",
+    "src/rendering/gameRenderer.js",
+    "src/rendering/caatGameRenderer.js"
   ]
 }
