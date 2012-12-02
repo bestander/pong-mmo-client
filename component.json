@@ -3,19 +3,26 @@
   "repo": "bestander/super-pong",
   "description": "HTML5 pong multiplayer game that can be embedded on a page",
   "version": "0.1.0",
-  "keywords": ["game", "html5", "canvas"],
+  "keywords": [
+    "game",
+    "html5",
+    "canvas"
+  ],
   "dependencies": {
     "component/emitter": "*",
-    "bestander/declare.js": "*"
+    "bestander/CAAT": "*"
   },
   "development": {
     "bestander/jasmine-component": "*"
   },
+  "main": "index.js",
   "scripts": [
     "index.js",
-    "lib/gameEvents.js",
-    "lib/pongObjects.js",
-    "lib/pongGame.js",
-    "lib/pongField.js"
+    "src/pongGame.js",
+    "src/master/gameMaster.js",
+    "src/master/socketGameMaster.js",
+    "src/player/player.js",
+    "src/rendering/gameRenderer.js",
+    "src/rendering/caatGameRenderer.js"
   ]
 }
