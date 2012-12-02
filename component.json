@@ -23,7 +23,7 @@
     "src/master/gameMaster.js",
     "src/master/socketGameMaster.js",
     "src/player/player.js",
-    "src/renderin g/gameRenderer.js",
+    "src/rendering/gameRenderer.js",
     "src/rendering/caatGameRenderer.js"
   ]
 }
