@@ -1,12 +1,13 @@
 {
-  "name": "super-pong",
-  "repo": "bestander/super-pong",
-  "description": "HTML5 pong multiplayer game that can be embedded on a page",
-  "version": "0.1.0",
+  "name": "pong-mmo-client",
+  "repo": "bestander/pong-mmo-client",
+  "description": "HTML5 pong mass multiplayer game",
+  "version": "0.2.0",
   "keywords": [
     "game",
     "html5",
-    "canvas"
+    "canvas",
+    "multiplayer"
   ],
   "dependencies": {
     "component/emitter": "*",
@@ -22,7 +23,7 @@
     "src/master/gameMaster.js",
     "src/master/socketGameMaster.js",
     "src/player/player.js",
-    "src/rendering/gameRenderer.js",
+    "src/renderin g/gameRenderer.js",
     "src/rendering/caatGameRenderer.js"
   ]
 }
