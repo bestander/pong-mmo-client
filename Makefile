@@ -4,8 +4,7 @@ build: components index.js
 	@uglifyjs ./build/build.js -o ./build/build-min.js -c -m
 
 build-dev: components index.js
-	@component build --dev -n build-dev.js
-	@uglifyjs ./build/build-dev.js -o ./build/build-dev-min.js -c -m
+	@component build --dev -n build-dev
 
 components: component.json
 	@component install --dev

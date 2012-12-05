@@ -12,6 +12,7 @@ var CAAT = require('CAAT').CAAT;
 
 var CaatGameRenderer = function (gameEvents){
   GameRenderer.call(this, gameEvents);
+  this._defineEventHandlers();
   initScene();
 };
 
@@ -19,6 +20,30 @@ CaatGameRenderer.prototype = Object.create(GameRenderer.prototype);
 
 CaatGameRenderer.prototype.startRendering = function(){
   CAAT.loop(20);
+};
+
+CaatGameRenderer.prototype._defineEventHandlers = function () {
+  var that = this;
+  this._gameEvents.on("BALL_CHANGED_POSITION", function (data) {
+    that._getNormalizedPositionFromBox2dToCaat(data.position);
+  });
+  this._gameEvents.on("PLAYER_1_CHANGED_POSITION", function (data) {
+
+  });
+  this._gameEvents.on("PLAYER_2_CHANGED_POSITION", function (data) {
+
+  });
+};
+
+CaatGameRenderer.prototype._getNormalizedPositionFromBox2dToCaat = function (pos) {
+  // TODO
+  return pos;
+};
+
+CaatGameRenderer.prototype._scheduleObjectRender = function (objectPositionsBag, position, time) {
+  // TODO this one is cool and tricky: because we receive new positions at random times because of network lags we have to
+  // display the objects a bit behind then server's time, this will make the graphics smoother
+  console.log("%s is at %s on %t");
 };
 
 module.exports = CaatGameRenderer;

@@ -11,19 +11,42 @@ var GameMaster = require('./gameMaster.js');
 var SocketGameMaster = function (gameEventEmitter, playerCommandsEmitters, remoteServer) {
   GameMaster.call(this, gameEventEmitter, playerCommandsEmitters);
   this.socket = io.connect(remoteServer);
-  this.socket.on("OBJECT_ADDED", function (data) {
-    //gameEventEmitter.emit()
-  });
-  this.socket.on("BALL_MOVED", function (data) {
-
-  });
-  this.socket.on("PADDLE_MOVED", function (data) {
-
-  });
-
+  this._defineGameSocketMessages();
+  this._serverAndClientTimeDifferenceMillisec = 0;
+  this._updateLagTime();
+  this._defineCommandsHandler();
 };
 
 SocketGameMaster.prototype = Object.create(GameMaster.prototype);
+
+SocketGameMaster.prototype._defineGameSocketMessages = function () {
+  var that = this;
+  this.socket.on("WORLD_UPDATE", function (data) {
+    that.gameEventEmitter.emit("BALL_CHANGED_POSITION", {
+      time: data.serverTime + this._serverAndClientTimeDifferenceMillisec,
+      position: data.ball.position
+    });
+    that.gameEventEmitter.emit("PLAYER_1_CHANGED_POSITION", {
+      time: data.serverTime + this._serverAndClientTimeDifferenceMillisec,
+      position: data.players[0].position
+    });
+    that.gameEventEmitter.emit("PLAYER_2_CHANGED_POSITION", {
+      time: data.serverTime + this._serverAndClientTimeDifferenceMillisec,
+      position: data.players[1].position
+    });
+  });
+};
+
+SocketGameMaster.prototype._updateLagTime = function () {
+  // todo send ping request to server and server will return it's local time, the lag time will be:
+  // server's time - client's time - half the round trip time.
+  // setInterval ...
+};
+
+SocketGameMaster.prototype._defineCommandsHandler = function () {
+  // todo
+};
+
 
 
 module.exports = SocketGameMaster;
