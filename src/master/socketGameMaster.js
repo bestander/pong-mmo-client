@@ -22,15 +22,15 @@ SocketGameMaster.prototype = Object.create(GameMaster.prototype);
 SocketGameMaster.prototype._defineGameSocketMessages = function () {
   var that = this;
   this._socket.on("WORLD_UPDATE", function (data) {
-    that.gameEventEmitter.emit("BALL_CHANGED_POSITION", {
+    that._gameEvents.emit("BALL_CHANGED_POSITION", {
       time: data.serverTime + this._serverAndClientTimeDifferenceMillisec,
       position: data.ball.position
     });
-    that.gameEventEmitter.emit("PLAYER_1_CHANGED_POSITION", {
+    that._gameEvents.emit("PLAYER_1_CHANGED_POSITION", {
       time: data.serverTime + this._serverAndClientTimeDifferenceMillisec,
       position: data.players[0].position
     });
-    that.gameEventEmitter.emit("PLAYER_2_CHANGED_POSITION", {
+    that._gameEvents.emit("PLAYER_2_CHANGED_POSITION", {
       time: data.serverTime + this._serverAndClientTimeDifferenceMillisec,
       position: data.players[1].position
     });
