@@ -16,9 +16,8 @@
   "development": {
     "bestander/jasmine-component": "*"
   },
-  "main": "index.js",
+  "main": "src/pongGame.js",
   "scripts": [
-    "index.js",
     "src/pongGame.js",
     "src/master/gameMaster.js",
     "src/master/socketGameMaster.js",
