@@ -1,9 +1,9 @@
 
-build: components index.js
+build: src/pongGame.js
 	@component build
 	@uglifyjs ./build/build.js -o ./build/build-min.js -c -m
 
-build-dev: components index.js
+build-dev: src/pongGame.js
 	@component build --dev -n build-dev
 
 components: component.json

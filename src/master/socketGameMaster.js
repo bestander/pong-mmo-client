@@ -10,7 +10,7 @@ var GameMaster = require('./gameMaster.js');
 
 var SocketGameMaster = function (gameEventEmitter, playerCommandsEmitters, remoteServer) {
   GameMaster.call(this, gameEventEmitter, playerCommandsEmitters);
-  this.socket = io.connect(remoteServer);
+  this._socket = io.connect(remoteServer);
   this._defineGameSocketMessages();
   this._serverAndClientTimeDifferenceMillisec = 0;
   this._updateLagTime();
@@ -21,7 +21,7 @@ SocketGameMaster.prototype = Object.create(GameMaster.prototype);
 
 SocketGameMaster.prototype._defineGameSocketMessages = function () {
   var that = this;
-  this.socket.on("WORLD_UPDATE", function (data) {
+  this._socket.on("WORLD_UPDATE", function (data) {
     that.gameEventEmitter.emit("BALL_CHANGED_POSITION", {
       time: data.serverTime + this._serverAndClientTimeDifferenceMillisec,
       position: data.ball.position
