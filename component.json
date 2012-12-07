@@ -14,7 +14,7 @@
     "bestander/CAAT": "*"
   },
   "development": {
-    "bestander/jasmine-component": "*"
+    "bestander/jasmine": "*"
   },
   "main": "src/pongGame.js",
   "scripts": [

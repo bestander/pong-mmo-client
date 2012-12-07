@@ -1,45 +1,76 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
+    "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>Jasmine Spec Runner</title>
+  <title>Jasmine Spec Runner</title>
 
-    <link rel="stylesheet" type="text/css" href="../components/bestander-jasmine-component/lib/jasmine-1.2.0/jasmine.css">
-    <script type="text/javascript" src="../components/bestander-jasmine-component/lib/jasmine-1.2.0/jasmine.js"></script>
-    <script type="text/javascript" src="../components/bestander-jasmine-component/lib/jasmine-1.2.0/jasmine-html.js"></script>
+  <link rel="stylesheet" type="text/css" href="../build/build-dev.css">
 
-    <script type="text/javascript" src="../build/build.js"></script>
+  <script type="text/javascript" src="../build/build-dev.js"></script>
 
-    <!--<script type="text/javascript" src="field.spec.js"></script>-->
+  <script type="text/javascript">
+    (function () {
+      var execJasmine;
+      var mergeRecursive;
+      var currentWindowOnload;
+      var htmlReporter;
+      var jasmineCore = require("pong-mmo-client/deps/jasmine");
+      var jasmine = jasmineCore.jasmine;
+      var jasmineEnv = jasmine.getEnv();
 
-    <script type="text/javascript">
-        (function() {
-            var jasmineEnv = jasmine.getEnv();
-            jasmineEnv.updateInterval = 1000;
+      jasmineEnv.updateInterval = 1000;
 
-            var htmlReporter = new jasmine.HtmlReporter();
+      htmlReporter = new jasmine.HtmlReporter();
 
-            jasmineEnv.addReporter(htmlReporter);
+      jasmineEnv.addReporter(htmlReporter);
 
-            jasmineEnv.specFilter = function(spec) {
-                return htmlReporter.specFilter(spec);
-            };
+      jasmineEnv.specFilter = function (spec) {
+        return htmlReporter.specFilter(spec);
+      };
 
-            var currentWindowOnload = window.onload;
+      currentWindowOnload = window.onload;
 
-            window.onload = function() {
-                if (currentWindowOnload) {
-                    currentWindowOnload();
-                }
-                execJasmine();
-            };
+      window.onload = function () {
+        if (currentWindowOnload) {
+          currentWindowOnload();
+        }
+        execJasmine();
+      };
 
-            function execJasmine() {
-                jasmineEnv.execute();
+      execJasmine = function execJasmine() {
+        jasmineEnv.execute();
+      };
+      /*
+       * Recursively merge properties of two objects
+       */
+      mergeRecursive = function mergeRecursive(obj1, obj2) {
+        for (var p in obj2) {
+          if (obj2.hasOwnProperty(p)) {
+            try {
+              // Property in destination object set; update its value.
+              if (obj2[p].constructor === Object) {
+                obj1[p] = mergeRecursive(obj1[p], obj2[p]);
+
+              } else {
+                obj1[p] = obj2[p];
+
+              }
+            } catch (e) {
+              // Property in destination object not set; create it and set its value.
+              obj1[p] = obj2[p];
             }
+          }
+        }
+        return obj1;
+      };
 
-        })();
-    </script>
+      // exposing jasmine objects to current scope
+      mergeRecursive(window, jasmineCore);
+    })();
+
+  </script>
+
+  <script type="text/javascript" src="socketGameMaster.spec.js"></script>
 
 </head>
 
