@@ -54,6 +54,27 @@ describe("Socket Game Master", function () {
       var gameMaster = new GameMaster(gameEventsEmitter, [], address);
       expect(window.io.connect).toHaveBeenCalledWith(address);
     });
+
+    it("initiates a client-server time synchronization routine", function () {
+
+    });
+
+  });
+
+  describe("listens to socket UPDATE_WORLD messages", function () {
+    it("and emits object change state events", function () {
+
+    });
+
+    it("and emits events with consideration of server and client time difference", function () {
+
+    });
+  });
+
+  describe("Listens to player commands", function () {
+    it("and periodically sends them to server", function () {
+
+    });
   });
 
 
