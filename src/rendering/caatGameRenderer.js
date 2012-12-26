@@ -10,11 +10,11 @@ var GameRenderer = require('./gameRenderer.js');
 var CAAT = require('CAAT').CAAT;
 
 
-var CaatGameRenderer = function (gameEvents){
+function CaatGameRenderer (gameEvents){
   GameRenderer.call(this, gameEvents);
   this._defineEventHandlers();
 //  initScene();
-};
+}
 
 CaatGameRenderer.prototype = Object.create(GameRenderer.prototype);
 

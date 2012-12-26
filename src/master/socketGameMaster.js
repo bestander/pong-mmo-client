@@ -9,14 +9,14 @@ var GameMaster = require('./gameMaster.js');
 var uid = require('uid');
 
 
-var SocketGameMaster = function (gameEventEmitter, playerCommandsEmitters, remoteServer) {
+function SocketGameMaster (gameEventEmitter, playerCommandsEmitters, remoteServer) {
   GameMaster.call(this, gameEventEmitter, playerCommandsEmitters);
   this._socket = io.connect(remoteServer);
   this._defineGameSocketMessages();
   this._serverAndClientTimeDifferenceMillisec = 0;
   this._updateLagTime();
   this._defineCommandsHandler();
-};
+}
 
 SocketGameMaster.prototype = Object.create(GameMaster.prototype);
 

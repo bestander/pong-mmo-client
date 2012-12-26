@@ -5,6 +5,6 @@
  */
 "use strict";
 
-var GameObjectPositionsQueue = function () {
+function GameObjectPositionsQueue () {
 
 };

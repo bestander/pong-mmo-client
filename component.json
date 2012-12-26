@@ -2,7 +2,7 @@
   "name": "pong-mmo-client",
   "repo": "bestander/pong-mmo-client",
   "description": "HTML5 pong mass multiplayer game",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "keywords": [
     "game",
     "html5",
@@ -17,9 +17,9 @@
   "development": {
     "bestander/jasmine": "*"
   },
-  "main": "src/pongGame.js",
+  "main": "index.js",
   "scripts": [
-    "src/pongGame.js",
+    "index.js",
     "src/master/gameMaster.js",
     "src/master/socketGameMaster.js",
     "src/player/player.js",
