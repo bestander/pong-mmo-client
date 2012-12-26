@@ -43,7 +43,7 @@ CaatGameRenderer.prototype._getNormalizedPositionFromBox2dToCaat = function (pos
 CaatGameRenderer.prototype._scheduleObjectRender = function (objectPositionsBag, position, time) {
   // TODO this one is cool and tricky: because we receive new positions at random times because of network lags we have to
   // display the objects a bit behind then server's time, this will make the graphics smoother
-  console.log("%s is located at %s at %t", objectPositionsBag, position, time);
+  console.log("%s is located at %s at %t", objectPositionsBag, JSON.stringify(position), time);
 };
 
 module.exports = CaatGameRenderer;

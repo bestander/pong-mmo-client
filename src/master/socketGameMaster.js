@@ -16,16 +16,25 @@ function SocketGameMaster (gameEventEmitter, playerCommandsEmitters, remoteServe
   this._serverAndClientTimeDifferenceMillisec = 0;
   this._updateLagTime();
   this._defineCommandsHandler();
+  this._connect();
 }
 
 SocketGameMaster.prototype = Object.create(GameMaster.prototype);
 
+SocketGameMaster.prototype._connect = function () {
+  this._socket.emit('START_GAME');
+};
+
+
 SocketGameMaster.prototype._defineGameSocketMessages = function () {
   var that = this;
-  this._socket.on("WORLD_UPDATE", function (data) {
+  this._socket.on("GAME_UPDATE", function (data) {
     that._gameEvents.emit("BALL_CHANGED_POSITION", {
       time: data.time + that._serverAndClientTimeDifferenceMillisec,
-      position: data.ball.position
+      position: {
+        x: data.objects.BALL.x,
+        y: data.objects.BALL.y
+      }
     });
     if(data.players){
       that._gameEvents.emit("PLAYER_1_CHANGED_POSITION", {
@@ -38,6 +47,10 @@ SocketGameMaster.prototype._defineGameSocketMessages = function () {
       });
     }
   });
+  this._socket.on('ENTERED_GAME', function () {
+    that._socket.emit('READY');
+  });
+
 };
 
 SocketGameMaster.prototype._updateLagTime = function () {

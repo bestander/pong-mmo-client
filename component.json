@@ -15,7 +15,8 @@
     "matthewmueller/uid": "*"
   },
   "development": {
-    "bestander/jasmine": "*"
+    "bestander/jasmine": "*",
+    "bestander/lodash": "*"
   },
   "main": "index.js",
   "scripts": [

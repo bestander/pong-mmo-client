@@ -4,6 +4,8 @@
 
 var GameMaster = require("pong-mmo-client/src/master/socketGameMaster.js");
 var Emitter = require('component-emitter');
+var _ = require('bestander-lodash')._;
+
 
 describe("Socket Game Master", function () {
 
@@ -58,9 +60,18 @@ describe("Socket Game Master", function () {
 
     });
 
+    it('sends "START_GAME" command', function () {
+      var gameMaster = new GameMaster(gameEventsEmitter, [], 'http://address');
+      expect(_.filter(socket.emit.calls, function (elem) {
+        return elem.args[0] === 'START_GAME';
+      }).length).toBe(1);
+
+
+    });
+
   });
 
-  describe("waits for UPDATE_WORLD command from server", function () {
+  describe("waits for GAME_UPDATE message from server", function () {
 
     var ballPositionEvent;
     var p1PositionEvent;
@@ -89,7 +100,7 @@ describe("Socket Game Master", function () {
       var gameMaster = new GameMaster(gameEventsEmitter, [], address);
 
       runs(function () {
-        socket.emit("WORLD_UPDATE", {
+        socket.emit("GAME_UPDATE", {
           time: new Date().getTime(),
           ball: {
             position: {
@@ -152,7 +163,7 @@ describe("Socket Game Master", function () {
           id: lagCheckId,
           time: new Date().getTime() + 5000
         });
-        socket.emit("WORLD_UPDATE", {
+        socket.emit("GAME_UPDATE", {
           time: new Date().getTime() + 6000,
           ball: {
             position: {
@@ -198,7 +209,7 @@ describe("Socket Game Master", function () {
             id: lagCheckId,
             time: time
           });
-          socket.emit("WORLD_UPDATE", {
+          socket.emit("GAME_UPDATE", {
             time: time,
             ball: {
               position: {
@@ -219,6 +230,33 @@ describe("Socket Game Master", function () {
         var eventTimeDiff = Math.abs(ballPositionEvent.time - (new Date().getTime() - 150));
         expect(eventTimeDiff).toBeLessThan(101);
       });
+    });
+  });
+
+  describe('waits for ENTERED_GAME message', function () {
+    
+    var gameParams = {
+      width: 500,
+      height: 400,
+      scale: 20
+    };
+    
+    it('and responds with READY command', function () {
+      var gameMaster = new GameMaster(gameEventsEmitter, [], 'http://address');
+      expect(_.filter(socket.emit.calls, function (elem) {
+        return elem.args[0] === 'READY';
+      }).length).toBe(0);
+      
+      socket.emit('ENTERED_GAME', gameParams);
+      expect(_.filter(socket.emit.calls, function (elem) {
+        return elem.args[0] === 'READY';
+      }).length).toBe(1);
+    });
+
+    it('and initiates renderer with game parameters', function () {
+      // TODO I guess game master should interface to renderer directly
+      expect(true).toBeFalsy();
+
     });
   });
 
