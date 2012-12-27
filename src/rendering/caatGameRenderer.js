@@ -7,35 +7,33 @@
 "use strict";
 
 var GameRenderer = require('./gameRenderer.js');
-var CAAT = require('CAAT').CAAT;
+var THREE = require('three');
+var TWEEN = require('tween.js');
 
 
 function CaatGameRenderer (gameEvents){
   GameRenderer.call(this, gameEvents);
   this._defineEventHandlers();
-//  initScene();
+  this._tween = new TWEEN.Tween({x: 0, y: 0});
+  this._initScene();
 }
 
 CaatGameRenderer.prototype = Object.create(GameRenderer.prototype);
 
-CaatGameRenderer.prototype.startRendering = function(){
-  //CAAT.loop(20);
-};
-
 CaatGameRenderer.prototype._defineEventHandlers = function () {
   var that = this;
   this._gameEvents.on("BALL_CHANGED_POSITION", function (data) {
-    that._scheduleObjectRender("BALL", that._getNormalizedPositionFromBox2dToCaat(data.position), data.time);
+    that._scheduleObjectRender("BALL", that._convertCoordFromBox2dToCanvas(data.position), data.time);
   });
   this._gameEvents.on("PLAYER_1_CHANGED_POSITION", function (data) {
-    that._scheduleObjectRender("PLAYER_1", that._getNormalizedPositionFromBox2dToCaat(data.position), data.time);
+    that._scheduleObjectRender("PLAYER_1", that._convertCoordFromBox2dToCanvas(data.position), data.time);
   });
   this._gameEvents.on("PLAYER_2_CHANGED_POSITION", function (data) {
-    that._scheduleObjectRender("PLAYER_2", that._getNormalizedPositionFromBox2dToCaat(data.position), data.time);
+    that._scheduleObjectRender("PLAYER_2", that._convertCoordFromBox2dToCanvas(data.position), data.time);
   });
 };
 
-CaatGameRenderer.prototype._getNormalizedPositionFromBox2dToCaat = function (pos) {
+CaatGameRenderer.prototype._convertCoordFromBox2dToCanvas = function (pos) {
   // TODO
   return pos;
 };
@@ -44,68 +42,97 @@ CaatGameRenderer.prototype._scheduleObjectRender = function (objectPositionsBag,
   // TODO this one is cool and tricky: because we receive new positions at random times because of network lags we have to
   // display the objects a bit behind then server's time, this will make the graphics smoother
   console.log("%s is located at %s at %t", objectPositionsBag, JSON.stringify(position), time);
+  this._tween.to({
+    x: position.x * 8,
+    y: position.y * 8
+  }, 1000).start();
 };
 
 module.exports = CaatGameRenderer;
 
-var initScene = function () {
-  var _director_4= new CAAT.Director().initialize(
-    600,
-    400);
+CaatGameRenderer.prototype._initScene = function () {
 
-  var _scene_4= _director_4.createScene();
+  // set the scene size
+  var WIDTH = 400,
+    HEIGHT = 400;
 
-  // these numbers correspond to anchor values:
-  // TOP_LEFT     TOP     TOP_RIGHT
-  // LEFT         CENTER  RIGHT
-  // BOTTOM_LEFT  BOTTOM  BOTTOM_RIGHT
-  var anchor= [
-    0,0, 0.50,0, 1.00,0,
-    0, 0.50, 0.50, 0.50, 1.00, 0.50,
-    0, 1.00, 0.50, 1.00, 1.00, 1.00
-  ];
+// set some camera attributes
+  var VIEW_ANGLE = 45,
+    ASPECT = WIDTH / HEIGHT,
+    NEAR = 0.1,
+    FAR = 10000;
 
-  var i;
+// get the DOM element to attach to
+// - assume we've got jQuery to hand
+  var $container = document.getElementById('container');
 
-  for( i=0; i<9; i++ ) {
+// create a WebGL renderer, camera
+// and a scene
+  var renderer = new THREE.WebGLRenderer();
+  var camera =
+    new THREE.PerspectiveCamera(
+      VIEW_ANGLE,
+      ASPECT,
+      NEAR,
+      FAR);
 
-    // background actors under rotating ones. Just to have a reference
-    // of where the anchor is.
-    var _scene_4_rotating_actor_background = new CAAT.Actor().
-      setLocation( 50+50*(i%3), 35+50*((i/3)>>0) ).
-      setSize( 30, 30 ).
-      setFillStyle('#ffffff').
-      setStrokeStyle('#000000').
-      // do not accept mouse events.
-      enableEvents(false);
-    _scene_4.addChild( _scene_4_rotating_actor_background );
+  var scene = new THREE.Scene();
 
-    // rotating actors.
-    var _scene_4_rotating_actor = new CAAT.Actor().
-      setLocation( 50+50*(i%3), 35+50*((i/3)>>0) ).
-      setSize( 30, 30 ).
-      setFillStyle('#ff0000');
-    // never ending rotating behavior
-    var _scene_4_rotating_behavior= new CAAT.RotateBehavior().
-      setCycle(true).
-      setFrameTime( 0, 2000 ).
-      setValues(0, 2*Math.PI, anchor[i*2], anchor[i*2+1] );
-    _scene_4_rotating_actor.addBehavior( _scene_4_rotating_behavior );
-    _scene_4.addChild( _scene_4_rotating_actor );
+// add the camera to the scene
+  scene.add(camera);
 
-    // scaling actors
-    var _scene_4_scaling_actor= new CAAT.Actor().
-      setLocation( 300+60*(i%3), 30+60*((i/3)>>0) ).
-      setSize( 30, 30 ).
-      setFillStyle('#ff00ff');
-    // never ending scaling behavior
-    var _scene_4_scaling_behavior= new CAAT.ScaleBehavior().
-      setCycle(true).
-      setFrameTime( 0, 2000 ).
-      setValues( .5, 1.5, .5, 1.5, anchor[i*2], anchor[i*2+1] ).
-      setPingPong();
-    _scene_4_scaling_actor.addBehavior(_scene_4_scaling_behavior);
-    _scene_4.addChild( _scene_4_scaling_actor );
+// the camera starts at 0,0,0
+// so pull it back
+  camera.position.z = 300;
+
+// start the renderer
+  renderer.setSize(WIDTH, HEIGHT);
+
+// attach the render-supplied DOM element
+  $container.appendChild(renderer.domElement);
+  
+  // set up the sphere vars
+  var radius = 10,
+    segments = 16,
+    rings = 16;
+
+  // create the sphere's material
+  var sphereMaterial =
+    new THREE.MeshLambertMaterial(
+      {
+        color: 0xCC0000
+      });
+
+// create a new mesh with
+// sphere geometry - we will cover
+// the sphereMaterial next!
+  var sphere = new THREE.Mesh(
+
+    new THREE.SphereGeometry(
+      radius,
+      segments,
+      rings),
+
+    sphereMaterial);
+
+// add the sphere to the scene
+  scene.add(sphere);
+
+  this._tween.onUpdate(function () {
+    sphere.position.x = this.x;
+    sphere.position.y = this.y;
+  });
+  animate();
+  
+
+  function animate() {
+
+    // note: three.js includes requestAnimationFrame shim
+    requestAnimationFrame( animate );
+    
+    TWEEN.update();
+    renderer.render( scene, camera );
+
   }
 };
 

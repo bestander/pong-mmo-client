@@ -9,7 +9,7 @@ function PongClient (serverUrl) {
   this.playerCommands = new Emitter();
   this.gameMaster = new SocketGameMaster(this.gameEventsEmitter, [this.playerCommands], serverUrl);
   this.renderer = new CaatGameRenderer(this.gameEventsEmitter);
-  this.renderer.startRendering();
+//  this.renderer.startRendering();
   //var player1 = new Player();
 }
 

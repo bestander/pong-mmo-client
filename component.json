@@ -11,8 +11,9 @@
   ],
   "dependencies": {
     "component/emitter": "*",
-    "bestander/CAAT": "*",
-    "matthewmueller/uid": "*"
+    "matthewmueller/uid": "*",
+    "cvdlab/three": "*",
+    "bestander/tween.js": "*"
   },
   "development": {
     "bestander/jasmine": "*",
