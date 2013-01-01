@@ -8,13 +8,13 @@
 
 var GameRenderer = require('./gameRenderer.js');
 var THREE = require('three');
-var TWEEN = require('tween.js');
+var Interpolator = require('animation-smoother');
 
 
 function CaatGameRenderer (gameEvents){
   GameRenderer.call(this, gameEvents);
   this._defineEventHandlers();
-  this._tween = new TWEEN.Tween({x: 0, y: 0});
+  this._ballPositions = new Interpolator({x: 0, y: 0});
   this._initScene();
 }
 
@@ -42,10 +42,10 @@ CaatGameRenderer.prototype._scheduleObjectRender = function (objectPositionsBag,
   // TODO this one is cool and tricky: because we receive new positions at random times because of network lags we have to
   // display the objects a bit behind then server's time, this will make the graphics smoother
   console.log("%s is located at %s at %t", objectPositionsBag, JSON.stringify(position), time);
-  this._tween.to({
+  this._ballPositions.scheduleNext({
     x: position.x * 8,
     y: position.y * 8
-  }, 1000).start();
+  }, 1000);
 };
 
 module.exports = CaatGameRenderer;
@@ -118,7 +118,7 @@ CaatGameRenderer.prototype._initScene = function () {
 // add the sphere to the scene
   scene.add(sphere);
 
-  this._tween.onUpdate(function () {
+  this._ballPositions.onCoordinateRequest(function () {
     sphere.position.x = this.x;
     sphere.position.y = this.y;
   });
@@ -129,8 +129,8 @@ CaatGameRenderer.prototype._initScene = function () {
 
     // note: three.js includes requestAnimationFrame shim
     requestAnimationFrame( animate );
-    
-    TWEEN.update();
+
+    Interpolator.updateAll();
     renderer.render( scene, camera );
 
   }
