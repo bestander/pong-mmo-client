@@ -11,7 +11,7 @@
   ],
   "dependencies": {
     "component/emitter": "0.0.6",
-    "cvdlab/three": "*",
+    "cvdlab/three": "0.54.0",
     "bestander/animation-smoother": "1.0.0",
     "bestander/box2d-tools": "*"
   },

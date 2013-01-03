@@ -30,12 +30,12 @@ describe("Socket Game Driver", function () {
   describe("when created", function () {
     it("initiates a socket.io connection to a specified server", function () {
       var address = "http://game.com";
-      var gameMaster = new GameDriver(address);
+      var gameDriver = new GameDriver(address);
       expect(window.io.connect).toHaveBeenCalledWith(address);
     });
 
-    it("initiates time synchronization with server sending a LAG_CHECK command", function () {
-      var gameMaster;
+    it("synchronizes clocks with server sending a LAG_CHECK command", function () {
+      var gameDriver;
       var address = "http://game.com";
       var lagCheckParams;
 
@@ -45,7 +45,7 @@ describe("Socket Game Driver", function () {
       });
 
       runs(function () {
-        gameMaster = new GameDriver(address);
+        gameDriver = new GameDriver(address);
       });
 
       waitsFor(function () {
@@ -54,8 +54,12 @@ describe("Socket Game Driver", function () {
 
     });
 
+    it('makes LAG_CHECK request every 2 seconds and notifies renderer about PING each time it receives a response', function () {
+
+    });
+
     xit('sends "START_GAME" command', function () {
-      var gameMaster = new GameMaster(gameEventsEmitter, [], 'http://address');
+      var gameDriver = new gameDriver(gameEventsEmitter, [], 'http://address');
       expect(_.filter(socket.emit.calls, function (elem) {
         return elem.args[0] === 'START_GAME';
       }).length).toBe(1);
@@ -91,7 +95,7 @@ describe("Socket Game Driver", function () {
 
     it("and emits object change state events", function () {
       var address = "http://game.com";
-      var gameMaster = new GameMaster(gameEventsEmitter, [], address);
+      var gameDriver = new gameDriver(gameEventsEmitter, [], address);
 
       runs(function () {
         socket.emit("GAME_UPDATE", {
@@ -144,7 +148,7 @@ describe("Socket Game Driver", function () {
       });
 
       runs(function () {
-        var gameMaster = new GameMaster(gameEventsEmitter, [], address);
+        var gameDriver = new gameDriver(gameEventsEmitter, [], address);
       });
 
       waitsFor(function () {
@@ -188,7 +192,7 @@ describe("Socket Game Driver", function () {
       });
 
       runs(function () {
-        var gameMaster = new GameMaster(gameEventsEmitter, [], address);
+        var gameDriver = new gameDriver(gameEventsEmitter, [], address);
       });
 
       waitsFor(function () {
@@ -236,7 +240,7 @@ describe("Socket Game Driver", function () {
     };
     
     it('and responds with READY command', function () {
-      var gameMaster = new GameMaster(gameEventsEmitter, [], 'http://address');
+      var gameDriver = new gameDriver(gameEventsEmitter, [], 'http://address');
       expect(_.filter(socket.emit.calls, function (elem) {
         return elem.args[0] === 'READY';
       }).length).toBe(0);
