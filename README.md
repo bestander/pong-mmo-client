@@ -1,34 +1,30 @@
-Super Pong: HTML5 Pong multiplayer game
+pong-mmo-client
 =============
 
-WIP It is a very early development stage
+HTML5 JavaScript Pong game client.  
 
+See [documentation](https://github.com/bestander/pong-mmo-www/tree/master/documentation) for details about goals, design and usage.
 
-
-Description
-------------
-
-TODO
-
-
-API
-------------
-
-
-This web project has the following setup:
--------------
-
-* component.json - [component](https://github.com/component/component/) library descriptor
-* Makefile - make descriptor for downloading resources, building and cleaning a build. Requires component(1) and uglifyjs to be installed
-* index.js - main CommonJS module that binds all the pieces together
-* src/ - all sources are here
-* tests/ - [jasmine](http://pivotal.github.com/jasmine/) unit tests and test spec runner
-* Makefile - standard compilation descriptor for [component](https://github.com/component/component/)
-* demo/ - folder for example files
-* build/ - folder that is created by [component](https://github.com/component/component/) with `make build` command
-* components/ - folder with project dependencies, will be created by [component](https://github.com/component/component/) with 'make components' command
-* MIT-LICENSE - license wording
 
 License
-----------
-All application code is released under MIT License, dependencies have their own permissive open source licenses.
+--------
+Copyright 2012 Konstantin Raev (bestander@gmail.com)
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

@@ -5,8 +5,8 @@
 
 "use strict";
 
-var GameRenderer = function (gameEvents) {
+function GameRenderer (gameEvents) {
   this._gameEvents = gameEvents;
-};
+}
 
 module.exports = GameRenderer;
