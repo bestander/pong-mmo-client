@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Driver-less renderer demo</title>
+</head>
+<body>
+<p>
+    Unit testing renderer module is quite hard, instead we have a demo html file that helps us to debug the renderer by hand
+</p>
+
+<div id="gameContainer" style="width: 400px; height: 400px;">
+
+</div>
+
+<script type="text/javascript" src="../build/build-dev.js"></script>
+<script type="text/javascript">
+    var Renderer = require('pong-mmo-client/src/pongGameRenderer.js');
+    var renderer = new Renderer('gameContainer');
+    renderer.showScene();
+    renderer.renderGameUpdate(
+            {
+                'BALL': {
+                    'position': {x: 100, y:100}
+                },
+                'delay': 3000
+            });
+</script>
+
+</body>
+</html>
