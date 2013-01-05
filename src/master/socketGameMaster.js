@@ -15,7 +15,7 @@ function SocketGameMaster (gameEventEmitter, playerCommandsEmitters, remoteServe
   this._defineGameSocketMessages();
   this._serverAndClientTimeDifferenceMillisec = 0;
   this._updateLagTime();
-  this._defineCommandsHandler();
+  this._defineGameSetupCommandsHandler();
   this._connect();
 }
 
@@ -69,7 +69,7 @@ SocketGameMaster.prototype._updateLagTime = function () {
   this._socket.emit("LAG_CHECK", requestId);
 };
 
-SocketGameMaster.prototype._defineCommandsHandler = function () {
+SocketGameMaster.prototype._defineGameSetupCommandsHandler = function () {
   // todo
 };
 
