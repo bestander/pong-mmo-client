@@ -17,7 +17,7 @@
     var Renderer = require('pong-mmo-client/src/pongGameRenderer.js');
     var renderer = new Renderer('gameContainer');
     renderer.showScene();
-    renderer.addBall({x: 50, y:50});
+    renderer.addBall();
     renderer.addPlayer({"type": "left"});
     renderer.addPlayer({"type": "right"});
     renderer.renderGameUpdate(
@@ -46,6 +46,9 @@
         setTimeout(function  () {
             renderer.removePlayer('right');
         }, 1000);
+        setTimeout(function  () {
+            renderer.removeBall();
+        }, 2000);
 
     }, 2000);
 </script>

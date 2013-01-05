@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="run tests Mac" type="JavascriptDebugSession" factoryName="Local">
     <JSDebuggerConfigurationSettings>
-      <option name="engineId" value="firefox" />
+      <option name="engineId" value="chrome" />
       <option name="fileUrl" value="file://$PROJECT_DIR$/tests/JasmineSpecRunner.html" />
     </JSDebuggerConfigurationSettings>
     <RunnerSettings RunnerId="JavascriptDebugRunner" />

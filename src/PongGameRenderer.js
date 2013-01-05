@@ -122,7 +122,12 @@ PongGameRenderer.prototype.renderGameUpdate = function (objects) {
   }
 };
 
+/**
+ * add ball to field
+ * @param [position] position on the field, optional
+ */
 PongGameRenderer.prototype.addBall = function (position) {
+  position = position || {x: 0, y: 0};
   if(!this._ballObject){
     // create the sphere's material
     this._ballObject = new THREE.Mesh(
@@ -139,6 +144,12 @@ PongGameRenderer.prototype.addBall = function (position) {
     this._scene.add(this._ballObject);
   }
 };
+
+PongGameRenderer.prototype.removeBall = function () {
+  this._scene.remove(this._ballObject);
+  this._ballObject = null;
+};
+
 
 PongGameRenderer.prototype.addPlayer = function (params) {
   if(params.type === 'left' && !this._leftPlayer){

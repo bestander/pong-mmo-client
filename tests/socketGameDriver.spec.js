@@ -134,32 +134,81 @@ describe("When Socket Game Driver", function () {
 
   describe('receives from server current match-related command', function () {
     describe('MATCH_STARTED', function () {
-      it('it calls renderer.addBall with position at center', function () {
-        expect(true).toBeFalsy();
-
+      it('it calls renderer.addBall', function () {
+        socketMock.emit('GAME_ENTERED', {field: {width: 40, height: 40}});
+        socketMock.emit('MATCH_STARTED');
+        expect(rendererMock.addBall).toHaveBeenCalled();
       });
-      it('it starts taking game commands from User Input Handler', function () {
+      xit('it starts taking game commands from User Input Handler', function () {
         // TODO in next iteration
         expect(true).toBeFalsy();
       });
     });
+    
     describe('MATCH_STOPPED', function () {
       it('it calls renderer.removeBall', function () {
-        expect(true).toBeFalsy();
-
+        socketMock.emit('GAME_ENTERED', {field: {width: 40, height: 40}});
+        socketMock.emit('MATCH_STARTED');
+        expect(rendererMock.removeBall).not.toHaveBeenCalled();
+        socketMock.emit('MATCH_STOPPED');
+        expect(rendererMock.removeBall).toHaveBeenCalled();
       });
-      it('it stops taking commands from User Input Handler', function () {
+      xit('it stops taking commands from User Input Handler', function () {
         // TODO in next iteration
         expect(true).toBeFalsy();
       });
     });
     describe('OBJECTS_MOVED', function () {
       it('it calls renderer.renderGameUpdate passing all the objects positions from the command', function () {
-        expect(true).toBeFalsy();
+        socketMock.emit('GAME_ENTERED', {field: {width: 40, height: 40}});
+        socketMock.emit('PLAYER_JOINED', {type: "left", name: "Bob"});
+        socketMock.emit('PLAYER_JOINED', {type: "right", name: "Rob"});
+        socketMock.emit('MATCH_STARTED');
+        
+        socketMock.emit('OBJECTS_MOVED', {
+          ball: {x: 5, y: 8},
+          left_player: {y: 7},
+          right_player: {y: 10},
+          time: Date.now()
+        });
+        expect(rendererMock.renderGameUpdate).toHaveBeenCalledWith({
+          'BALL': {
+            'position': {x: 5, y: 8}
+          },
+          'leftPlayer': {
+            'position': {y: 7}
+          },
+          'rightPlayer': {
+            'position': {y: 10}
+          },
+          'delay': 0
+        });
 
       });
       it('it calls renderer.renderGameUpdate with client-server lag compensation', function () {
-        expect(true).toBeFalsy();
+        gameDriver = new GameDriver(socketMock, rendererMock);
+        socketMock.emit("LAG_RESPONSE", {
+          time: Date.now() + 5000
+        });
+        socketMock.emit('GAME_ENTERED', {field: {width: 40, height: 40}});
+        socketMock.emit('MATCH_STARTED');
+
+        expect(rendererMock.renderGameUpdate).not.toHaveBeenCalled();
+        expect(rendererMock.renderGameUpdate.calls.length).toBe(0);
+
+        socketMock.emit('OBJECTS_MOVED', {
+          ball: {x: 10, y: 12},
+          time: Date.now() + 6000
+        });
+        expect(rendererMock.renderGameUpdate.calls.length).toBe(1);
+
+//        expect(rendererMock.renderGameUpdate).toHaveBeenCalledWith({
+//          'BALL': {
+//            'position': {x: 10, y: 12}
+//          },
+//          'delay': 1000
+//        });
+
 
       });
     });

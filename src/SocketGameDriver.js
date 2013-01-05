@@ -29,6 +29,7 @@ function SocketGameDriver (socket, renderer) {
   this._sceneRendered = false;
   this._pingServer();
   this._defineGameSetupCommandsHandler();
+  this._defineMatchCommandsHandler();
 }
 
 module.exports = SocketGameDriver;
@@ -85,4 +86,30 @@ SocketGameDriver.prototype._defineGameSetupCommandsHandler = function () {
 
 SocketGameDriver.prototype._defineMatchCommandsHandler = function () {
   var that = this;
+  this._socket.on('MATCH_STARTED', function () {
+    that._renderer.addBall();
+  });
+  this._socket.on('MATCH_STOPPED', function () {
+    that._renderer.removeBall();
+  });
+  this._socket.on('OBJECTS_MOVED', function (data) {
+    var update = {};
+    if(data.ball){
+      update.BALL = {
+        'position': data.ball
+      };
+    }
+    if(data.left_player){
+      update.leftPlayer = {
+        'position': data.left_player
+      };
+    }
+    if(data.right_player){
+      update.rightPlayer = {
+        'position': data.right_player
+      };
+    }
+    update.delay = 0;
+    that._renderer.renderGameUpdate(update);
+  });
 };

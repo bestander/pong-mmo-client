@@ -2,6 +2,7 @@
     "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>Jasmine Spec Runner</title>
 
   <link rel="stylesheet" type="text/css" href="../build/build-dev.css">
@@ -37,13 +38,13 @@
         execJasmine();
       };
 
-      execJasmine = function execJasmine() {
+      execJasmine = function execJasmine () {
         jasmineEnv.execute();
       };
       /*
        * Recursively merge properties of two objects
        */
-      mergeRecursive = function mergeRecursive(obj1, obj2) {
+      mergeRecursive = function mergeRecursive (obj1, obj2) {
         for (var p in obj2) {
           if (obj2.hasOwnProperty(p)) {
             try {
