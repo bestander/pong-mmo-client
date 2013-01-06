@@ -10,6 +10,8 @@
 /*global io:true */
 "use strict";
 
+var DELAY_BETWEEN_COMMANDS_MS = 100;
+
 /**
  * Create driver object
  * @param socket socket.io connection
@@ -25,7 +27,7 @@ function SocketGameDriver (socket, renderer) {
   }
   this._socket = socket;
   this._renderer = renderer;
-  this._serverAndClientTimeDifferenceMillisec = 0;
+  this._clientToServerTimeDifferenceMillis = 0;
   this._sceneRendered = false;
   this._pingServer();
   this._defineGameSetupCommandsHandler();
@@ -44,18 +46,28 @@ SocketGameDriver.prototype.ready = function () {
   }
 };
 
+SocketGameDriver.prototype.executePlayerCommand = function (command) {
+//  this._lastCommandSentTime = this._lastCommandSentTime || Date.now() - DELAY_BETWEEN_COMMANDS_MS;
+//  
+//  if(Date.now() - this._lastCommandSentTime < DELAY_BETWEEN_COMMANDS_MS){
+//    // stack commands for a batch submit
+//    setTimeout(this.executePlayerCommand)
+//  }
+  this._socket.emit('PLAYER_COMMAND', [command]);
+  this._lastCommandSentTime = Date.now();
+};
 
 SocketGameDriver.prototype._pingServer = function () {
   // send ping request to server and server will return it's local time, the lag time will be:
   // server's time - client's time - half the round trip time.
   var that = this;
-  var timeSent = new Date().getTime();
-  this._socket.on('LAG_RESPONSE', function (data) {
+  var clientRequestTime = Date.now();
+  this._socket.on('LAG_RESPONSE', function (response) {
     // server and client time difference
-    var currentTime = new Date().getTime();
-    that._serverAndClientTimeDifferenceMillisec = currentTime - data.time;
+    var clientNow = Date.now();
+    that._clientToServerTimeDifferenceMillis = clientNow - response.time;
     // network lag compensation = half of round trip time
-    that._serverAndClientTimeDifferenceMillisec -= (currentTime - timeSent) / 2;
+    that._clientToServerTimeDifferenceMillis += (clientNow - clientRequestTime) / 2;
   });
   this._socket.emit('LAG_CHECK');
 };
@@ -109,7 +121,11 @@ SocketGameDriver.prototype._defineMatchCommandsHandler = function () {
         'position': data.right_player
       };
     }
-    update.delay = 0;
+    update.delay = data.time + that._clientToServerTimeDifferenceMillis - Date.now();
     that._renderer.renderGameUpdate(update);
   });
+  this._socket.on('PLAYER_SCORED', function (data) {
+    that._renderer.playerScored(data);
+  });
+
 };
