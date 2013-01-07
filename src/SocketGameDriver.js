@@ -47,14 +47,7 @@ SocketGameDriver.prototype.ready = function () {
 };
 
 SocketGameDriver.prototype.executePlayerCommand = function (command) {
-//  this._lastCommandSentTime = this._lastCommandSentTime || Date.now() - DELAY_BETWEEN_COMMANDS_MS;
-//  
-//  if(Date.now() - this._lastCommandSentTime < DELAY_BETWEEN_COMMANDS_MS){
-//    // stack commands for a batch submit
-//    setTimeout(this.executePlayerCommand)
-//  }
   this._socket.emit('PLAYER_COMMAND', [command]);
-  this._lastCommandSentTime = Date.now();
 };
 
 SocketGameDriver.prototype._pingServer = function () {
@@ -67,7 +60,7 @@ SocketGameDriver.prototype._pingServer = function () {
     var clientNow = Date.now();
     that._clientToServerTimeDifferenceMillis = clientNow - response.time;
     // network lag compensation = half of round trip time
-    that._clientToServerTimeDifferenceMillis += (clientNow - clientRequestTime) / 2;
+    that._clientToServerTimeDifferenceMillis -= (clientNow - clientRequestTime) / 2;
   });
   this._socket.emit('LAG_CHECK');
 };
@@ -105,6 +98,7 @@ SocketGameDriver.prototype._defineMatchCommandsHandler = function () {
     that._renderer.removeBall();
   });
   this._socket.on('OBJECTS_MOVED', function (data) {
+    var clientTimeLineStamp;
     var update = {};
     if(data.ball){
       update.BALL = {
@@ -121,7 +115,8 @@ SocketGameDriver.prototype._defineMatchCommandsHandler = function () {
         'position': data.right_player
       };
     }
-    update.delay = data.time + that._clientToServerTimeDifferenceMillis - Date.now();
+    clientTimeLineStamp = data.time + that._clientToServerTimeDifferenceMillis; 
+    update.delay = clientTimeLineStamp - Date.now();
     that._renderer.renderGameUpdate(update);
   });
   this._socket.on('PLAYER_SCORED', function (data) {

@@ -177,6 +177,14 @@ PongGameRenderer.prototype.removePlayer = function (type) {
   }
 };
 
+// TODO player ready
+
+// TODO player scored
+
+// TODO single delay for all events
+
+// TODO show scene scale
+
 PongGameRenderer.prototype._definePaddle = function () {
   return new THREE.Mesh(
     new THREE.CubeGeometry(

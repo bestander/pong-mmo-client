@@ -190,7 +190,7 @@ describe("When Socket Game Driver", function () {
 
       });
       
-      it('it calls renderer.renderGameUpdate with client-server time difference compensation', function () {
+      it('it calls renderer.renderGameUpdate and compensates time difference when there is no network lag', function () {
         var updateParams;
         var driver = new GameDriver(socket, rendererMock);
 
@@ -221,7 +221,7 @@ describe("When Socket Game Driver", function () {
         expect(updateParams.delay).toBeCloseTo(2000, -1);
       });
 
-      it('it calls renderer.renderGameUpdate with network delay compensation', function () {
+      it('it calls renderer.renderGameUpdate and compensates both server time being ahead of client time and network lag', function () {
  
         var updateParams;
         var driver = new GameDriver(socket, rendererMock);
@@ -248,13 +248,49 @@ describe("When Socket Game Driver", function () {
         expect(rendererMock.renderGameUpdate.calls.length).toBe(1);
         updateParams = rendererMock.renderGameUpdate.mostRecentCall.args[0];
         expect(updateParams.BALL).toEqual({'position': {x: 10, y: 12}});
-        // 1. At startTime + 500 we received LAG_RESPONSE with server time being equal to startTime + 5000, this means 
-        // that client clock is behind server by 4500 ms
-        // 2. But the lag of getting server's clock was 500 ms, i.e. time for message to travel from server to client is
-        // about 250 ms. I.e. the clock difference is 4500 - 250 = 4250 ms
-        // 3. If we subtract 4250 ms from server timestamp of OBJECTS_MOVED event, we will get client timestamp of the event,
-        // considering that current time us startTime + 1000 then the delay for animation will be (7000 - 4250) - 1000 = 1750
-        expect(updateParams.delay).toBeCloseTo(1750, -1);
+        // 1. The lag of getting server's clock was 500 ms, i.e. time for message to travel from server to client is
+        // about 250 ms
+        // 2. At moment (0 + 250) ms on the client the server time was 0 + 5000 ms, then client time = server time + 5000 - 250
+        // 3. If we subtract 4750 ms from server timestamp of OBJECTS_MOVED event, we will get client timestamp of the event,
+        // considering that current time on client: 7000 - 4750 = 2250 in client time line
+        // 4. The OBJECTS_MOVED is received at 0 + 1000 ms moment in client time line, i.e. the delay for animation is 2250 - 1000 = 1250
+        expect(updateParams.delay).toBeCloseTo(1250, -1);
+      });
+
+      it('it calls renderer.renderGameUpdate and compensates both server time being behind client time and network lag', function () {
+ 
+        var updateParams;
+        var driver = new GameDriver(socket, rendererMock);
+        // introduce 500 millis delay
+        var startTime = Date.now();
+        spyOn(Date, 'now').andReturn(startTime + 400);
+
+        // and 5000 millis time difference
+        socket.emit("LAG_RESPONSE", {
+          time: startTime - 5000
+        });
+
+        socket.emit('GAME_ENTERED', {field: {width: 40, height: 40}});
+        socket.emit('MATCH_STARTED');
+
+        // and to make it even funnier, the object moved event is fired 1000 ms after GameDriver was created
+        Date.now.andReturn(startTime + 1000);
+        socket.emit('OBJECTS_MOVED', {
+          ball: {x: 10, y: 12},
+          time: startTime - 4000
+        });
+
+
+        expect(rendererMock.renderGameUpdate.calls.length).toBe(1);
+        updateParams = rendererMock.renderGameUpdate.mostRecentCall.args[0];
+        expect(updateParams.BALL).toEqual({'position': {x: 10, y: 12}});
+        // 1. The lag of getting server's clock was 400 ms, i.e. time for message to travel from server to client is
+        // about 200 ms
+        // 2. At moment (0 + 200) ms on the client the server time was (0 - 5000) ms, then client time = server time - 5000 - 200
+        // 3. If we add 5200 ms to server timestamp of OBJECTS_MOVED event, we will get client timestamp of the event,
+        // considering that current time on client: -4000 + 5200 = 1200 in client time line
+        // 4. The OBJECTS_MOVED is received at 0 + 1000 ms moment in client time line, i.e. the delay for animation is 200 ms
+        expect(updateParams.delay).toBeCloseTo(200, -1);
 
 
       });
@@ -281,7 +317,8 @@ describe("When Socket Game Driver", function () {
       expect(socketMock.emit).toHaveBeenCalledWith('PLAYER_COMMAND', [command]);
     });
 
-    it('more than once within 100 ms it passes the second and more commands to server in one batch', function () {
+    // TODO premature optimization
+    xit('more than once within 100 ms it passes the second and more commands to server in one batch', function () {
       var batch;
       var command;
       jasmine.Clock.useMock();
@@ -310,10 +347,11 @@ describe("When Socket Game Driver", function () {
       command = {someCommandToSendToServer: 5};
       batch.push(command);
       gameDriver.executePlayerCommand(command);
+      expect(getSentCommands(socketMock).length).toBe(1);
 
       jasmine.Clock.tick(100);
       expect(getSentCommands(socketMock).length).toBe(2);
-      expect(_.last(getSentCommands(socketMock)).args).toEqual('PLAYER_COMMAND', batch);
+      expect(_.last(getSentCommands(socketMock)).args).toEqual(['PLAYER_COMMAND', batch]);
 
       command = {someCommandToSendToServer: 5};
       gameDriver.executePlayerCommand(command);
