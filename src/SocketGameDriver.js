@@ -68,7 +68,7 @@ SocketGameDriver.prototype._pingServer = function () {
 
 SocketGameDriver.prototype._defineGameSetupCommandsHandler = function () {
   var that = this;
-  this._socket.on('GAME_ENTERED', function (data) {
+  this._socket.on('ENTERED_GAME', function (data) {
     that._sceneRendered = true;
     that._renderer.showScene(data.field);
   });

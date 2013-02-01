@@ -8,7 +8,7 @@ components: component.json
 clean:
 	rm -rf build components
 
-.PHONY: clean
+.PHONY: clean build components
 
 
 
