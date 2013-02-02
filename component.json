@@ -10,9 +10,10 @@
     "multiplayer"
   ],
   "dependencies": {
-    "component/emitter": "0.0.6",
     "cvdlab/three": "0.54.0",
-    "bestander/animation-smoother": "1.0.1"
+    "bestander/animation-smoother": "1.0.1",
+    "juliangruber/events": "0.0.1",
+    "component/clone": "0.1.0"
   },
   "development": {
     "bestander/jasmine": "1.3.1",
@@ -21,7 +22,7 @@
   "main": "index.js",
   "scripts": [
     "index.js",
-    "src/socketGameDriver.js",
+    "src/serverTimeSync.js",
     "src/pongGameRenderer.js",
     "src/userInputHandler.js"
   ]
