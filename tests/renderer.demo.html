@@ -16,7 +16,7 @@
 <script type="text/javascript">
     var Renderer = require('pong-mmo-client/src/pongGameRenderer.js');
     var renderer = new Renderer('gameContainer');
-    renderer.showScene();
+    renderer.showScene({width: 10, height: 10});
     renderer.addBall();
     renderer.addPlayer({"type": "left"});
     renderer.addPlayer({"type": "right"});

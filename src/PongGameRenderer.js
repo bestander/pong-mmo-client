@@ -25,8 +25,9 @@ module.exports = PongGameRenderer;
 
 /**
  * display scene: intro, lobby, match
+ * @param field with width and height properties
  */
-PongGameRenderer.prototype.showScene = function () {
+PongGameRenderer.prototype.showScene = function (field) {
   var boundingBox;
   var boundingBoxConfig;
   var pointLight;
@@ -178,6 +179,9 @@ PongGameRenderer.prototype.removePlayer = function (type) {
 };
 
 // TODO player ready
+PongGameRenderer.prototype.playerReady = function (type) {
+  
+};
 
 // TODO player scored
 

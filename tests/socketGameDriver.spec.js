@@ -1,13 +1,25 @@
-/*jshint node:true indent:2*/
-/*global it:true describe:true expect:true spyOn:true beforeEach:true afterEach:true jasmine:true runs waitsFor*/
-"use strict";
 
-var GameDriver = require("pong-mmo-client/src/socketGameDriver.js");
+/*jshint camelcase:false, indent:2, quotmark:true, nomen:false, onevar:false, passfail:false */
+/*global it:true describe:true expect:true spyOn:true beforeEach:true afterEach:true jasmine:true runs waitsFor*/
+'use strict';
+
+var GameDriver = require('pong-mmo-client/src/socketGameDriver.js');
 var Emitter = require('component-emitter');
 var _ = require('bestander-lodash')._;
 
 
-describe("When Socket Game Driver", function () {
+/**
+ * filter jasmine spied function calls by first argument
+ * @param calls calls array
+ * @param firstArg value of first arg
+ */
+function getCallsFilteredByFirstArg(calls, firstArg) {
+  return _.filter(calls, function (elem) {
+    return elem.args[0] === firstArg;
+  });
+}
+
+describe('When Socket Game Driver', function () {
 
   var socketMock;
   var rendererMock;
@@ -16,77 +28,79 @@ describe("When Socket Game Driver", function () {
   beforeEach(function () {
     // replace socket.io socket with a simple events emitter
     socketMock = new Emitter();
-    spyOn(socketMock, "on").andCallThrough();
-    spyOn(socketMock, "emit").andCallThrough();
+    spyOn(socketMock, 'on').andCallThrough();
+    spyOn(socketMock, 'emit').andCallThrough();
     
     rendererMock = jasmine.createSpyObj('rendererMock', ['showScene', 'addPlayer', 'removePlayer', 'addBall', 'removeBall',
-      'playerReady', 'renderGameUpdate', 'playerScored']);
+      'playerReady', 'renderGameUpdate', 'scoreChanged']);
     gameDriver = new GameDriver(socketMock, rendererMock);
   });
 
-  describe("is created", function () {
+  describe('is created', function () {
 
     it('without a socket or renderer it throws an error', function () {
       var throwing = function () {
         var driver = new GameDriver();
       };
-      expect(throwing).toThrow(new Error("socket is not defined"));
+      expect(throwing).toThrow(new Error('socket is not defined'));
       throwing = function () {
         var driver = new GameDriver(socketMock);
       };
-      expect(throwing).toThrow(new Error("renderer is not defined"));
+      expect(throwing).toThrow(new Error('renderer is not defined'));
     });
 
-    it("it sends a LAG_CHECK command", function () {
-      function getLagCheckMessages(socket) {
-        return _.filter(socket.emit.calls, function (elem) {
-          return elem.args[0] === 'LAG_CHECK';
-        });
-      }
-
+    it('it sends a LAG_CHECK command', function () {
       var driver;
       var socket = new Emitter();
-      spyOn(socket, "emit").andCallThrough();
+      spyOn(socket, 'emit').andCallThrough();
 
-      expect(getLagCheckMessages(socket).length).toBe(0);
+      expect(getCallsFilteredByFirstArg(socket.emit.calls, 'LAG_CHECK').length).toBe(0);
       driver = new GameDriver(socket, rendererMock);
-      expect(getLagCheckMessages(socket).length).toBe(1);
+      expect(getCallsFilteredByFirstArg(socket.emit.calls, 'LAG_CHECK').length).toBe(1);
     });
 
   });
 
   describe('function "startNewGame" is called', function () {
     it('it sends command START_GAME to server', function () {
-      function getStartNewGameMessages(socket) {
-        return _.filter(socket.emit.calls, function (elem) {
-          return elem.args[0] === 'START_GAME';
-        });
-      }
-      expect(getStartNewGameMessages(socketMock).length).toBe(0);
+      expect(getCallsFilteredByFirstArg(socketMock.emit.calls, 'START_GAME').length).toBe(0);
       gameDriver.startNewGame();
-      expect(getStartNewGameMessages(socketMock).length).toBe(1);
+      expect(getCallsFilteredByFirstArg(socketMock.emit.calls, 'START_GAME').length).toBe(1);
     });
 
   });
 
   describe('receives from server game setup command', function () {
-    describe('GAME_ENTERED', function () {
+    var genericRandomParam = {a : 'b'};
+
+    describe('ENTERED_GAME', function () {
       it('it calls renderer.showScene with dimensions taken from command', function () {
         expect(rendererMock.showScene).not.toHaveBeenCalled();
-        socketMock.emit('GAME_ENTERED', {field: {width: 40, height: 50}});
+        socketMock.emit('ENTERED_GAME', {field: {width: 40, height: 50}, players: []});
         expect(rendererMock.showScene).toHaveBeenCalledWith({width: 40, height: 50});
+      });
+
+      it('it calls renderer.addPlayer for all players from command data', function () {
+        var player1, player2;
+        player1 = {name: 'Bob'};
+        player2 = {name: 'Bill'};
+        socketMock.emit('ENTERED_GAME', {field: {width: 40, height: 50}, players: [player1, player2]});
+        expect(rendererMock.addPlayer.calls.length).toBe(2);
+        expect(rendererMock.addPlayer).toHaveBeenCalledWith(player1);
+        expect(rendererMock.addPlayer).toHaveBeenCalledWith(player2);
+
       });
     });
 
     describe('PLAYER_JOINED', function () {
       it('it calls renderer.addPlayer with parameters taken from command', function () {
-        socketMock.emit('GAME_ENTERED', {field: {width: 40, height: 40}});
-        socketMock.emit('PLAYER_JOINED', {type: "left", name: "Bob"});
-        expect(rendererMock.addPlayer).toHaveBeenCalledWith({type: "left", name: "Bob"});
+        socketMock.emit('GAME_ENTERED', {field: {width: 40, height: 40}, players: []});
+        socketMock.emit('PLAYER_JOINED', genericRandomParam);
+        expect(rendererMock.addPlayer).toHaveBeenCalledWith(genericRandomParam);
 
       });
       it('before GAME_ENTERED command it ignores PLAYER_JOINED', function () {
-        socketMock.emit('PLAYER_JOINED', {type: "left", name: "Bob"});
+        socketMock.emit('PLAYER_JOINED', genericRandomParam);
         expect(rendererMock.addPlayer).not.toHaveBeenCalled();
 
       });
@@ -94,12 +108,12 @@ describe("When Socket Game Driver", function () {
 
     describe('PLAYER_QUIT', function () {
       it('it calls renderer.addPlayer with parameters taken from command', function () {
-        socketMock.emit('GAME_ENTERED', {field: {width: 40, height: 40}});
-        socketMock.emit('PLAYER_QUIT', {type: "left"});
-        expect(rendererMock.removePlayer).toHaveBeenCalledWith({type: "left"});
+        socketMock.emit('GAME_ENTERED', {field: {width: 40, height: 40}, players: []});
+        socketMock.emit('PLAYER_QUIT', genericRandomParam);
+        expect(rendererMock.removePlayer).toHaveBeenCalledWith(genericRandomParam);
       });
       it('before GAME_ENTERED command it ignores PLAYER_QUIT', function () {
-        socketMock.emit('PLAYER_QUIT', {type: "left"});
+        socketMock.emit('PLAYER_QUIT', genericRandomParam);
         expect(rendererMock.removePlayer).not.toHaveBeenCalled();
       });
     });
@@ -107,31 +121,16 @@ describe("When Socket Game Driver", function () {
     describe('PLAYER_READY', function () {
       it('it calls renderer.playerReady with the type of player who is ready', function () {
         socketMock.emit('GAME_ENTERED', {field: {width: 40, height: 40}});
-        socketMock.emit('PLAYER_READY', {type: "right"});
-        expect(rendererMock.playerReady).toHaveBeenCalledWith({type: "right"});
+        socketMock.emit('PLAYER_READY', genericRandomParam);
+        expect(rendererMock.playerReady).toHaveBeenCalledWith(genericRandomParam);
       });
       it('before GAME_ENTERED command it ignores PLAYER_READY', function () {
-        socketMock.emit('PLAYER_READY', {type: "left"});
+        socketMock.emit('PLAYER_READY', genericRandomParam);
         expect(rendererMock.playerReady).not.toHaveBeenCalled();
       });
 
     });
   });
-
-  describe('function "ready" is called', function () {
-    it('it sends READY message to server', function () {
-      socketMock.emit('GAME_ENTERED', {field: {width: 40, height: 40}});
-      gameDriver.ready();
-      expect(socketMock.emit).toHaveBeenCalledWith("READY");
-    });
-    
-    it('before GAME_ENTERED command it does not send anything', function () {
-      gameDriver.ready();
-      expect(socketMock.emit).not.toHaveBeenCalledWith("READY");
-    });
-
-  });
-
 
   describe('receives from server current match-related command', function () {
     describe('MATCH_STARTED', function () {
@@ -139,11 +138,6 @@ describe("When Socket Game Driver", function () {
         socketMock.emit('GAME_ENTERED', {field: {width: 40, height: 40}});
         socketMock.emit('MATCH_STARTED');
         expect(rendererMock.addBall).toHaveBeenCalled();
-      });
-      
-      xit('it starts taking game commands from User Input Handler', function () {
-        // TODO in next iteration
-        expect(true).toBeFalsy();
       });
     });
     
@@ -156,12 +150,8 @@ describe("When Socket Game Driver", function () {
         expect(rendererMock.removeBall).toHaveBeenCalled();
       });
       
-      xit('it stops taking commands from User Input Handler', function () {
-        // TODO in next iteration
-        expect(true).toBeFalsy();
-      });
     });
-    describe('OBJECTS_MOVED', function () {
+    describe('MATCH_UPDATE', function () {
       var socket;
       beforeEach(function () {
         socket = new Emitter();
@@ -295,7 +285,7 @@ describe("When Socket Game Driver", function () {
 
       });
     });
-    describe('PLAYER_SCORED', function () {
+    describe('PLAYER_SCORE_CHANGED', function () {
       it('it calls renderer.playerScored passing the player type and score points from the command', function () {
         socketMock.emit('GAME_ENTERED', {field: {width: 40, height: 40}});
         socketMock.emit('PLAYER_JOINED', {type: "left", name: "Bob"});

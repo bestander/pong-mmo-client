@@ -3,14 +3,12 @@
  * The driver is responsible for:
  * - interpreting the game object state into commands for game renderer
  * - reading players' input and informing game object about users' intentions
- * 
+ *
  * Current implementation connects to a remote server which hosts the game object.
  */
 
-/*global io:true */
-"use strict";
-
-var DELAY_BETWEEN_COMMANDS_MS = 100;
+/*jshint camelcase:false, indent:2, quotmark:true, nomen:false, onevar:false, passfail:false */
+'use strict';
 
 /**
  * Create driver object
@@ -18,11 +16,11 @@ var DELAY_BETWEEN_COMMANDS_MS = 100;
  * @param renderer game renderer
  * @constructor
  */
-function SocketGameDriver (socket, renderer) {
-  if(!socket){
+function SocketGameDriver(socket, renderer) {
+  if (!socket) {
     throw new Error('socket is not defined');
   }
-  if(!renderer){
+  if (!renderer) {
     throw new Error('renderer is not defined');
   }
   this._socket = socket;
@@ -40,14 +38,8 @@ SocketGameDriver.prototype.startNewGame = function () {
   this._socket.emit('START_GAME');
 };
 
-SocketGameDriver.prototype.ready = function () {
-  if(this._sceneRendered === true){
-    this._socket.emit('READY');
-  }
-};
-
 SocketGameDriver.prototype.executePlayerCommand = function (command) {
-  this._socket.emit('PLAYER_COMMAND', [command]);
+  this._socket.emit('PLAYER_COMMAND', command);
 };
 
 SocketGameDriver.prototype._pingServer = function () {
@@ -71,19 +63,22 @@ SocketGameDriver.prototype._defineGameSetupCommandsHandler = function () {
   this._socket.on('ENTERED_GAME', function (data) {
     that._sceneRendered = true;
     that._renderer.showScene(data.field);
+    data.players.forEach(function (player) {
+      that._renderer.addPlayer(player);
+    });
   });
   this._socket.on('PLAYER_JOINED', function (data) {
-    if(that._sceneRendered === true){
+    if (that._sceneRendered === true) {
       that._renderer.addPlayer(data);
     }
   });
   this._socket.on('PLAYER_QUIT', function (data) {
-    if(that._sceneRendered === true){
+    if (that._sceneRendered === true) {
       that._renderer.removePlayer(data);
     }
   });
   this._socket.on('PLAYER_READY', function (data) {
-    if(that._sceneRendered === true){
+    if (that._sceneRendered === true) {
       that._renderer.playerReady(data);
     }
   });
@@ -92,34 +87,34 @@ SocketGameDriver.prototype._defineGameSetupCommandsHandler = function () {
 SocketGameDriver.prototype._defineMatchCommandsHandler = function () {
   var that = this;
   this._socket.on('MATCH_STARTED', function () {
-    that._renderer.addBall();
+    console.log('match started');
   });
   this._socket.on('MATCH_STOPPED', function () {
-    that._renderer.removeBall();
+    console.log('match stopped');
   });
-  this._socket.on('OBJECTS_MOVED', function (data) {
+  this._socket.on('MATCH_UPDATE', function (data) {
     var clientTimeLineStamp;
     var update = {};
-    if(data.ball){
+    if (data.ball) {
       update.BALL = {
-        'position': data.ball
+        'position' : data.ball
       };
     }
-    if(data.left_player){
+    if (data.left_player) {
       update.leftPlayer = {
-        'position': data.left_player
+        'position' : data.left_player
       };
     }
-    if(data.right_player){
+    if (data.right_player) {
       update.rightPlayer = {
-        'position': data.right_player
+        'position' : data.right_player
       };
     }
-    clientTimeLineStamp = data.time + that._clientToServerTimeDifferenceMillis; 
+    clientTimeLineStamp = data.time + that._clientToServerTimeDifferenceMillis;
     update.delay = clientTimeLineStamp - Date.now();
     that._renderer.renderGameUpdate(update);
   });
-  this._socket.on('PLAYER_SCORED', function (data) {
+  this._socket.on('PLAYER_SCORE_CHANGED', function (data) {
     that._renderer.playerScored(data);
   });
 
