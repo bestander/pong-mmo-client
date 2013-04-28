@@ -1,6 +1,8 @@
 pong-mmo-client
 =============
 
+The client is almost playable but is a bit flaky in animations area.  
+I don't know when I have the time to fix animation-smoother bug.  
 HTML5 JavaScript Pong game client.  
 
 See [documentation](https://github.com/bestander/pong-mmo-www/tree/master/documentation) for details about goals, design and usage.
